@@ -3,7 +3,7 @@ import React from 'react';
 const ExtraSection = () => {
     return (
         <div>
-            <h1>Extra Section</h1>
+            <h1>This is extra section</h1>
         </div>
     );
 };

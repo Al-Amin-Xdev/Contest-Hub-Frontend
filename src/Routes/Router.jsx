@@ -22,6 +22,7 @@ import MyContests from "../Components/Dashboard/Creator/MyContests";
 import Submissions from "../Components/Dashboard/Creator/Submissions";
 import ManageUsers from "../Components/Dashboard/Admin/ManageUsers";
 import ManageContests from "../Components/Dashboard/Admin/ManageContests";
+import ExtraSection from "../Pages/Home/ExtraSection";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,7 @@ const router = createBrowserRouter([
       { path: "/leaderboard", element: <Leaderboard /> },
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
+      { path: "/extra", element: <ExtraSection></ExtraSection> },
     ],
   },
   {

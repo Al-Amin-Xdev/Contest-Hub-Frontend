@@ -2,7 +2,6 @@
 // import NavBar from "../Shared-Components/NavBar";
 // import Footer from "../Shared-Components/Footer";
 
-
 // const MainLayout = () => {
 //   return (
 //     <>
@@ -10,28 +9,28 @@
 //       <Outlet />
 //       <Footer />
 //     </>
-    
+
 //   );
 // };
 
 // export default MainLayout;
 
 import { Outlet } from "react-router-dom"; // always use react-router-dom
-import NavBar from "../Shared-Components/NavBar";
 import Footer from "../Shared-Components/Footer";
-
+import Navbar from "../Shared-Components/NavBar";
 
 const MainLayout = () => {
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Main content */}
-      <main className="flex-1 w-full max-w-7xl px-4 sm:px-6 lg:px-8 mx-auto">
-        <NavBar></NavBar>
-        <Outlet />
-        <Footer></Footer>
-      
-      </main>
-    </div>
+     <>
+      <Navbar />
+
+      <div className="pt-16">
+        <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+          <Outlet />
+          <Footer />
+        </div>
+      </div>
+    </>
   );
 };
 
