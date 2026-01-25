@@ -1,11 +1,12 @@
 
 import { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaTrophy, FaUserCircle } from "react-icons/fa";
 import useAuth from "../../Hooks/useAuth";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [avatarURL, setAvatarURL] = useState("https://i.ibb.co/4pDNDk1/avatar.png");
@@ -24,7 +25,10 @@ const Navbar = () => {
     await logout();
     setDropdownOpen(false);
     setShowLogoutModal(true);
-    setTimeout(() => setShowLogoutModal(false), 2000);
+    setTimeout(() => {
+      setShowLogoutModal(false);
+      navigate("/login");
+    }, 2000);
   };
 
   const navLinkStyle = ({ isActive }) =>

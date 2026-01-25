@@ -19,13 +19,14 @@ const Login = () => {
     "auth/invalid-email": "Invalid email address",
   };
 
+  // Normal email/password login
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const form = e.target; // save form reference
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+    const form = e.target; // form reference
+    const email = form.email.value;
+    const password = form.password.value;
 
     try {
       const userInfo = await login(email, password);
@@ -38,9 +39,8 @@ const Login = () => {
         timer: 2000,
         showConfirmButton: false,
       });
-      form.reset();
-      
 
+      form.reset(); // reset form after login
       navigate(location?.state || "/");
     } catch (error) {
       Swal.fire({
@@ -56,45 +56,55 @@ const Login = () => {
     }
   };
 
-  // ✅ Google Login with role selection
+  // Google login with role check
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      const userInfo = await PopUpLogIn(); // Firebase Google sign-in
+      const userInfo = await PopUpLogIn();
       const user = userInfo.user;
 
-      // Show role selection modal
-      const { value: role } = await Swal.fire({
-        title: 'Select Role',
-        input: 'radio',
-        inputOptions: {
-          user: 'User',
-          creator: 'Contest Creator',
-        },
-        inputValidator: (value) => {
-          if (!value) return 'You need to choose a role!';
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Continue',
-      });
-
-      if (!role) {
-        // If modal cancelled
-        setLoading(false);
-        return;
+      // 1️⃣ Check if user already exists in backend
+      let role;
+      try {
+        const { data } = await axiosInstance.get(`/user-role/${user.uid}`);
+        role = data?.role; // existing role
+      } catch {
+        console.log("No existing user role found, need to select role.");
       }
 
-      // Save user with role in context
-      setUser({ ...user, role });
+      // 2️⃣ Show role selection modal only if role not found
+      if (!role) {
+        const { value: selectedRole } = await Swal.fire({
+          title: 'Select Role',
+          input: 'radio',
+          inputOptions: {
+            user: 'User',
+            creator: 'Contest Creator',
+          },
+          inputValidator: (value) => value ? null : 'You need to choose a role!',
+          showCancelButton: true,
+          confirmButtonText: 'Continue',
+        });
 
-      // Send user info to backend
-      await axiosInstance.post("/user-role", {
-        uid: user.uid,
-        name: user.displayName,
-        email: user.email,
-        photoURL: user.photoURL,
-        role,
-      });
+        if (!selectedRole) {
+          setLoading(false);
+          return; // user cancelled
+        }
+
+        role = selectedRole;
+
+        // 3️⃣ Save new user with role in backend
+        await axiosInstance.post("/user-role", {
+          uid: user.uid,
+          name: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          role,
+        });
+      }
+
+      // 4️⃣ Save user in context with role
+      setUser({ ...user, role });
 
       Swal.fire({
         icon: "success",
@@ -119,6 +129,7 @@ const Login = () => {
     }
   };
 
+  // Password reset
   const handleResetPassword = async () => {
     const { value: email } = await Swal.fire({
       title: "Reset Password",
@@ -175,7 +186,6 @@ const Login = () => {
           </p>
 
           <form onSubmit={handleLogin} className="space-y-4">
-            {/* Email */}
             <div>
               <label className="label text-sm font-medium text-gray-700 dark:text-gray-200">Email</label>
               <input
@@ -187,7 +197,6 @@ const Login = () => {
               />
             </div>
 
-            {/* Password */}
             <div>
               <label className="label text-sm font-medium text-gray-700 dark:text-gray-200">Password</label>
               <input
@@ -199,7 +208,6 @@ const Login = () => {
               />
             </div>
 
-            {/* Reset Password */}
             <div className="flex justify-end text-sm mb-2">
               <button
                 type="button"
@@ -210,7 +218,6 @@ const Login = () => {
               </button>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
@@ -222,7 +229,6 @@ const Login = () => {
 
           <div className="divider my-6 text-gray-400">OR</div>
 
-          {/* Google Login */}
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
