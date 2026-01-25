@@ -6,7 +6,7 @@ const DashboardLayout = () => {
     <div>
       {/* Dashboard Sidebar will go here later */}
       <Navbar></Navbar>
-      <Outlet />
+      <Outlet></Outlet>
       <h1>This is Dash board</h1>
     </div>
   );

@@ -1,25 +1,22 @@
-
 import { useLocation, useNavigate, NavLink } from "react-router-dom";
 import Swal from "sweetalert2";
 import { FcGoogle } from "react-icons/fc";
-import AuthContext from "../../Providers/AuthContext";
 import { useContext, useState } from "react";
+import AuthContext from "../../providers/AuthContext";
 
 const Login = () => {
-  const { login, PopUpLogIn, resetPassword, setUser } = useContext(AuthContext); // removed setLoading
-  const [loading, setLoading] = useState(false); // local loading state
+  const { login, PopUpLogIn, resetPassword, setUser } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Friendly Firebase error messages
   const firebaseErrorMap = {
     "auth/wrong-password": "Incorrect password",
     "auth/user-not-found": "User not found",
     "auth/invalid-email": "Invalid email address",
   };
 
-  // Email/password login
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -29,12 +26,12 @@ const Login = () => {
 
     try {
       const userInfo = await login(email, password);
-      setUser(userInfo);
+      setUser(userInfo.user);
 
       Swal.fire({
         icon: "success",
         title: "Login Successful",
-        text: "Welcome back! ✅",
+        text: `Welcome back, ${userInfo.user.displayName || "Contestant"}! ✅`,
         timer: 2000,
         showConfirmButton: false,
       });
@@ -54,17 +51,16 @@ const Login = () => {
     }
   };
 
-  // Google popup login
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
       const userInfo = await PopUpLogIn();
-      setUser(userInfo);
+      setUser(userInfo.user);
 
       Swal.fire({
         icon: "success",
         title: "Login Successful",
-        text: "Signed in with Google ✅",
+        text: `Signed in with Google, ${userInfo.user.displayName}! ✅`,
         timer: 2000,
         showConfirmButton: false,
       });
@@ -84,7 +80,6 @@ const Login = () => {
     }
   };
 
-  // Reset password
   const handleResetPassword = async () => {
     const { value: email } = await Swal.fire({
       title: "Reset Password",
@@ -119,45 +114,48 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* Branding Section */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-green-600 to-emerald-700 text-white justify-center items-center p-16">
+      {/* Branding / Banner Section */}
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-700 to-purple-700 text-white justify-center items-center p-16">
         <div className="max-w-md">
-          <h1 className="text-5xl font-bold mb-4">Welcome Back 🌱</h1>
+          <h1 className="text-5xl font-bold mb-4">Welcome Back 🎉</h1>
           <p className="text-lg opacity-90">
-            Log in to connect with farmers, traders, and consumers. Manage crops, interests, and deals — all in one place.
+            Log in to ContestHub to participate, create, and manage exciting contests.  
+            Track your wins and showcase your achievements to the community.
           </p>
         </div>
       </div>
 
       {/* Login Form */}
-      <div className="flex flex-1 justify-center items-center p-6 bg-gray-50">
-        <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-10">
-          <h2 className="text-3xl font-bold text-center mb-2">Sign In</h2>
-          <p className="text-sm text-gray-500 text-center mb-6">
-            Enter your credentials to continue
+      <div className="flex flex-1 justify-center items-center p-6 bg-gray-50 dark:bg-slate-900">
+        <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-10">
+          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-2">
+            Sign In
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-300 text-center mb-6">
+            Enter your credentials to access your dashboard
           </p>
 
           {/* Email / Password Form */}
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="label text-sm font-medium">Email</label>
+              <label className="label text-sm font-medium text-gray-700 dark:text-gray-200">Email</label>
               <input
                 type="email"
                 name="email"
                 placeholder="you@example.com"
                 required
-                className="input input-bordered w-full rounded-lg px-4 py-2"
+                className="input input-bordered w-full rounded-lg px-4 py-2 dark:bg-slate-700 dark:text-white"
               />
             </div>
 
             <div>
-              <label className="label text-sm font-medium">Password</label>
+              <label className="label text-sm font-medium text-gray-700 dark:text-gray-200">Password</label>
               <input
                 type="password"
                 name="password"
                 placeholder="••••••••"
                 required
-                className="input input-bordered w-full rounded-lg px-4 py-2"
+                className="input input-bordered w-full rounded-lg px-4 py-2 dark:bg-slate-700 dark:text-white"
               />
             </div>
 
@@ -165,7 +163,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={handleResetPassword}
-                className="text-green-600 hover:underline font-medium"
+                className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
               >
                 Forgot Password?
               </button>
@@ -174,29 +172,29 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="btn btn-neutral w-full py-3 rounded-lg hover:bg-green-600 hover:text-white transition"
+              className="btn w-full py-3 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold hover:scale-105 transition"
             >
               {loading ? "Logging in..." : "Login"}
             </button>
           </form>
 
-          <div className="divider my-6">OR</div>
+          <div className="divider my-6 text-gray-400">OR</div>
 
           {/* Google Login */}
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="btn btn-outline w-full flex items-center justify-center gap-2 py-3 rounded-lg hover:bg-gray-100 transition"
+            className="btn btn-outline w-full flex items-center justify-center gap-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition text-white"
           >
             <FcGoogle size={22} />
             Continue with Google
           </button>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
+          <p className="text-center text-sm text-gray-500 dark:text-gray-300 mt-6">
             Don't have an account?{" "}
             <NavLink
               to="/register"
-              className="text-green-600 font-medium hover:underline"
+              className="text-blue-600 dark:text-blue-400 font-medium hover:underline"
             >
               Register Now
             </NavLink>
