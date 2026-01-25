@@ -3,9 +3,11 @@ import Swal from "sweetalert2";
 import { FcGoogle } from "react-icons/fc";
 import { useContext, useState } from "react";
 import AuthContext from "../../providers/AuthContext";
+import useAxios from "../../Hooks/useAxios";
 
 const Login = () => {
   const { login, PopUpLogIn, resetPassword, setUser } = useContext(AuthContext);
+  const axiosInstance = useAxios();
   const [loading, setLoading] = useState(false);
 
   const location = useLocation();
@@ -21,6 +23,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
 
+    const form = e.target; // save form reference
     const email = e.target.email.value;
     const password = e.target.password.value;
 
@@ -35,6 +38,8 @@ const Login = () => {
         timer: 2000,
         showConfirmButton: false,
       });
+      form.reset();
+      
 
       navigate(location?.state || "/");
     } catch (error) {
@@ -51,16 +56,50 @@ const Login = () => {
     }
   };
 
+  // ✅ Google Login with role selection
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      const userInfo = await PopUpLogIn();
-      setUser(userInfo.user);
+      const userInfo = await PopUpLogIn(); // Firebase Google sign-in
+      const user = userInfo.user;
+
+      // Show role selection modal
+      const { value: role } = await Swal.fire({
+        title: 'Select Role',
+        input: 'radio',
+        inputOptions: {
+          user: 'User',
+          creator: 'Contest Creator',
+        },
+        inputValidator: (value) => {
+          if (!value) return 'You need to choose a role!';
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Continue',
+      });
+
+      if (!role) {
+        // If modal cancelled
+        setLoading(false);
+        return;
+      }
+
+      // Save user with role in context
+      setUser({ ...user, role });
+
+      // Send user info to backend
+      await axiosInstance.post("/user-role", {
+        uid: user.uid,
+        name: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+        role,
+      });
 
       Swal.fire({
         icon: "success",
         title: "Login Successful",
-        text: `Signed in with Google, ${userInfo.user.displayName}! ✅`,
+        text: `Signed in with Google as ${role}! ✅`,
         timer: 2000,
         showConfirmButton: false,
       });
@@ -114,7 +153,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* Branding / Banner Section */}
+      {/* Branding / Banner */}
       <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-700 to-purple-700 text-white justify-center items-center p-16">
         <div className="max-w-md">
           <h1 className="text-5xl font-bold mb-4">Welcome Back 🎉</h1>
@@ -135,8 +174,8 @@ const Login = () => {
             Enter your credentials to access your dashboard
           </p>
 
-          {/* Email / Password Form */}
           <form onSubmit={handleLogin} className="space-y-4">
+            {/* Email */}
             <div>
               <label className="label text-sm font-medium text-gray-700 dark:text-gray-200">Email</label>
               <input
@@ -148,6 +187,7 @@ const Login = () => {
               />
             </div>
 
+            {/* Password */}
             <div>
               <label className="label text-sm font-medium text-gray-700 dark:text-gray-200">Password</label>
               <input
@@ -159,6 +199,7 @@ const Login = () => {
               />
             </div>
 
+            {/* Reset Password */}
             <div className="flex justify-end text-sm mb-2">
               <button
                 type="button"
@@ -169,6 +210,7 @@ const Login = () => {
               </button>
             </div>
 
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}

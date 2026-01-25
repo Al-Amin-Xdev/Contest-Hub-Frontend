@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const AxiosInstance = axios.create({
-  baseURL: 'https://krishi-link-server-nine.vercel.app'
+  baseURL: 'http://localhost:5000'
 })
 
 const useAxios =()=>{

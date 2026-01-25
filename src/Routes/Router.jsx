@@ -62,7 +62,7 @@ const router = createBrowserRouter([
         path: "add-contest",
         element: (
           <RoleRoute role="creator">
-            <AddContest />
+            <AddContest></AddContest>
           </RoleRoute>
         ),
       },
