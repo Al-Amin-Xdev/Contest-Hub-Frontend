@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { FaUsers, FaClipboardList } from "react-icons/fa";
+import ManageUsers from "./ManageUsers";
+import ManageContests from "./ManageContests";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("users");
@@ -40,29 +42,13 @@ const AdminDashboard = () => {
       <main className="flex-1 p-6 overflow-auto">
         {activeTab === "users" && (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
-              Users Management
-            </h2>
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow p-6">
-              {/* User Table Placeholder */}
-              <p className="text-gray-500 dark:text-gray-300 text-center py-10">
-                User Table Goes Here 🧑‍💻
-              </p>
-            </div>
+            <ManageUsers></ManageUsers>
           </div>
         )}
 
         {activeTab === "contests" && (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
-              Contests Management
-            </h2>
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow p-6">
-              {/* Contests Table Placeholder */}
-              <p className="text-gray-500 dark:text-gray-300 text-center py-10">
-                Contests Table Goes Here 🏆
-              </p>
-            </div>
+           <ManageContests></ManageContests>
           </div>
         )}
       </main>
