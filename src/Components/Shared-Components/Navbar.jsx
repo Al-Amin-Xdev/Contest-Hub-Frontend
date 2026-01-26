@@ -106,7 +106,7 @@ const Navbar = () => {
                       className={navLinkStyle}
                       onClick={() => setDropdownOpen(false)}
                     >
-                      Edit Profile
+                      Your Profile
                     </NavLink>
                   )}
 

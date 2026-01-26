@@ -3,6 +3,9 @@ import { FaUser, FaClipboardList, FaTrophy, FaEdit } from "react-icons/fa";
 import Swal from "sweetalert2";
 import useAxios from "../../../Hooks/useAxios";
 import AuthContext from "../../../providers/AuthContext";
+import ParticipatedContests from "./ParticipatedContests";
+import WinningContests from "./WinningContests";
+import Loading from "../../Shared-Components/Loader";
 
 const Profile = () => {
   const { user: currentUser } = useContext(AuthContext);
@@ -95,7 +98,7 @@ const Profile = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center text-gray-500 dark:text-gray-300">
-        Loading Profile...
+        <Loading></Loading>
       </div>
     );
   }
@@ -182,13 +185,13 @@ const Profile = () => {
 
           {activeTab === "participated" && (
             <div className="text-center text-gray-600 dark:text-gray-300">
-              <p>My Participated Contests Component Goes Here 🚀</p>
+              <ParticipatedContests></ParticipatedContests>
             </div>
           )}
 
           {activeTab === "winning" && (
             <div className="text-center text-gray-600 dark:text-gray-300">
-              <p>My Winning Contests Component Goes Here 🏆</p>
+              <WinningContests></WinningContests>
             </div>
           )}
         </div>
