@@ -24,6 +24,8 @@ import ManageUsers from "../Components/Dashboard/Admin/ManageUsers";
 import ManageContests from "../Components/Dashboard/Admin/ManageContests";
 import ExtraSection from "../Pages/Home/ExtraSection";
 import AllContests from "../Pages/AllContests/AllContest";
+import Creator from "../Components/Dashboard/Creator/Creator";
+import Admin from "../Components/Dashboard/Admin/Admin";
 
 const router = createBrowserRouter([
   {
@@ -55,10 +57,25 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
+
+      //Normal user Dashboard route ===============================================================
+      //=====================================================================================
+
+      
       { path: "profile", element: <Profile></Profile> },
       { path: "participated", element: <ParticipatedContests/> },
       { path: "winning", element: <WinningContests /> },
 
+      //Creator Dashboard route ===============================================================
+      //=====================================================================================
+      {
+        path: "creator-dashboard", // ✅ corrected path
+        element: (
+          <RoleRoute role="creator">
+            <Creator />
+          </RoleRoute>
+        ),
+      },
       {
         path: "add-contest",
         element: (
@@ -67,6 +84,7 @@ const router = createBrowserRouter([
           </RoleRoute>
         ),
       },
+      
       {
         path: "my-contests",
         element: (
@@ -84,6 +102,17 @@ const router = createBrowserRouter([
         ),
       },
 
+      //Admin Dashboard route ===============================================================
+      //=====================================================================================
+
+      {
+        path: "admin-dashboard", 
+        element: (
+          <RoleRoute role="admin">
+            <Admin></Admin>
+          </RoleRoute>
+        ),
+      },
       {
         path: "manage-users",
         element: (

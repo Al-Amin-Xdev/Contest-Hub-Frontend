@@ -294,9 +294,9 @@ const Login = () => {
     }
 
     if (role === "admin") {
-      navigate("/dashboard/manage-users", { replace: true });
+      navigate("/dashboard/admin-dashboard", { replace: true });
     } else if (role === "creator") {
-      navigate("/dashboard/my-contests", { replace: true });
+      navigate("/dashboard/creator-dashboard", { replace: true });
     } else {
       navigate("/dashboard/profile", { replace: true });
     }
