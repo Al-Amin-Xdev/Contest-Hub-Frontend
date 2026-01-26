@@ -26,6 +26,9 @@ import ExtraSection from "../Pages/Home/ExtraSection";
 import AllContests from "../Pages/AllContests/AllContest";
 import Creator from "../Components/Dashboard/Creator/Creator";
 import Admin from "../Components/Dashboard/Admin/Admin";
+import AdminDashboard from "../Components/Dashboard/Admin/AdminDashboard";
+import CreatorDashboard from "../Components/Dashboard/Creator/CreatorDashboard";
+import UserDashboard from "../Components/Dashboard/User/UserDashboard";
 
 const router = createBrowserRouter([
   {
@@ -61,18 +64,27 @@ const router = createBrowserRouter([
       //Normal user Dashboard route ===============================================================
       //=====================================================================================
 
-      
+
       { path: "profile", element: <Profile></Profile> },
+      { path: "user-dashboard", element: <UserDashboard></UserDashboard> },
       { path: "participated", element: <ParticipatedContests/> },
       { path: "winning", element: <WinningContests /> },
 
       //Creator Dashboard route ===============================================================
       //=====================================================================================
       {
-        path: "creator-dashboard", // ✅ corrected path
+        path: "creator-profile", // ✅ corrected path
         element: (
           <RoleRoute role="creator">
             <Creator />
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "creator-dashboard", // ✅ corrected path
+        element: (
+          <RoleRoute role="creator">
+            <CreatorDashboard></CreatorDashboard>
           </RoleRoute>
         ),
       },
@@ -106,10 +118,18 @@ const router = createBrowserRouter([
       //=====================================================================================
 
       {
-        path: "admin-dashboard", 
+        path: "admin-profile", 
         element: (
           <RoleRoute role="admin">
             <Admin></Admin>
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "admin-dashboard", 
+        element: (
+          <RoleRoute role="admin">
+            <AdminDashboard></AdminDashboard>
           </RoleRoute>
         ),
       },

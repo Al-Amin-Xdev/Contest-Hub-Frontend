@@ -3,13 +3,17 @@ import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FaTrophy, FaUserCircle } from "react-icons/fa";
 import useAuth from "../../Hooks/useAuth";
+import useRole from "../../Hooks/useRole";
+
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { role, loading: roleLoading } = useRole();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [avatarURL, setAvatarURL] = useState("https://i.ibb.co/4pDNDk1/avatar.png");
+ 
 
   // Update avatar URL whenever user changes
   useEffect(() => {
@@ -38,6 +42,20 @@ const Navbar = () => {
         ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white"
         : "text-gray-200 hover:text-white hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600"
     }`;
+
+
+    // 🔹 ROLE BASED ROUTES
+    let profileRoute = "/dashboard/profile";
+    let dashboardRoute = "/dashboard/user-dashboard";
+
+    if (role === "admin") {
+      profileRoute = "/dashboard/admin-profile";
+      dashboardRoute = "/dashboard/admin-dashboard";
+    } else if (role === "creator") {
+      profileRoute = "/dashboard/creator-profile";
+      dashboardRoute = "/dashboard/creator-dashboard";
+    }
+
 
   return (
     <>
@@ -102,7 +120,7 @@ const Navbar = () => {
                   {/* Edit Profile */}
                   {user && (
                     <NavLink
-                      to="/dashboard/profile"
+                      to={profileRoute}
                       className={navLinkStyle}
                       onClick={() => setDropdownOpen(false)}
                     >
@@ -113,7 +131,7 @@ const Navbar = () => {
                   {/* Dashboard / Logout */}
                   {user ? (
                     <>
-                      <NavLink to="/dashboard" className={navLinkStyle} onClick={() => setDropdownOpen(false)}>Dashboard</NavLink>
+                      <NavLink to={dashboardRoute} className={navLinkStyle} onClick={() => setDropdownOpen(false)}>Dashboard</NavLink>
                       <button
                         onClick={handleLogout}
                         className="w-full text-left px-4 py-2 rounded-md font-semibold bg-gradient-to-r from-red-500 to-pink-500 text-white mt-1"

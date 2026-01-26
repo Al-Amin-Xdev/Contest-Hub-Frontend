@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useContext } from "react";
-import { FaEdit } from "react-icons/fa";
+import { FaUser, FaClipboardList, FaTrophy, FaEdit } from "react-icons/fa";
 import Swal from "sweetalert2";
-
 import useAxios from "../../../Hooks/useAxios";
 import AuthContext from "../../../providers/AuthContext";
+import ParticipatedContests from "./ParticipatedContests";
+import WinningContests from "./WinningContests";
+import Loading from "../../Shared-Components/Loader";
 
-const CreatorProfile = () => {
+const UserDashboard = () => {
   const { user: currentUser } = useContext(AuthContext);
   const axios = useAxios();
 
+  const [activeTab, setActiveTab] = useState("profile");
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch creator info
+  // Fetch user data from backend
   useEffect(() => {
     if (!currentUser?.uid) return;
 
@@ -22,11 +25,11 @@ const CreatorProfile = () => {
         const { data } = await axios.get(`/user-role/${currentUser.uid}`);
         setUserData(data);
       } catch (error) {
-        console.error("Fetch Creator Error:", error);
+        console.error("Fetch User Error:", error);
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "Failed to load creator data",
+          text: "Failed to load user data",
         });
       } finally {
         setLoading(false);
@@ -36,7 +39,7 @@ const CreatorProfile = () => {
     fetchUser();
   }, [currentUser?.uid, axios]);
 
-  // Edit Profile
+  // Handle profile update using POST /user-role API
   const handleUpdateProfile = async () => {
     const { value: formValues } = await Swal.fire({
       title: "Update Profile",
@@ -46,6 +49,8 @@ const CreatorProfile = () => {
       `,
       focusConfirm: false,
       showCancelButton: true,
+      confirmButtonText: "Save Changes",
+      cancelButtonText: "Cancel",
       preConfirm: () => {
         const name = document.getElementById("swal-name").value.trim();
         const photoURL = document.getElementById("swal-photo").value.trim();
@@ -62,10 +67,11 @@ const CreatorProfile = () => {
           uid: currentUser.uid,
           name: formValues.name,
           photoURL: formValues.photoURL,
-          email: userData.email,
-          role: userData.role,
+          email: userData.email, // keep existing email
+          role: userData.role,   // keep role
         });
 
+        // Update local state
         setUserData((prev) => ({
           ...prev,
           name: formValues.name,
@@ -92,7 +98,7 @@ const CreatorProfile = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center text-gray-500 dark:text-gray-300">
-        Loading Profile...
+        <Loading></Loading>
       </div>
     );
   }
@@ -118,31 +124,59 @@ const CreatorProfile = () => {
               />
             </h2>
             <p className="text-sm sm:text-base opacity-90">{userData?.email}</p>
-            <p className="mt-1 text-xs opacity-80">Role: {userData?.role}</p>
+            <p className="mt-2 text-sm sm:text-base font-semibold bg-white dark:bg-slate-700 inline-block px-3 py-1 rounded-full shadow">
+              Role: <span className="text-blue-500">{userData?.role}</span>
+            </p>
           </div>
         </div>
 
-        {/* Profile Info */}
+        {/* 🔹 Banner */}
+        <div className="text-center py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-lg rounded-t-3xl shadow-md mb-4">
+          User Dashboard
+        </div>
+
+        {/* Tabs */}
+        <div className="flex justify-center sm:justify-start gap-4 bg-gray-100 dark:bg-slate-700 p-4 rounded-b-3xl">
+          <button
+            onClick={() => setActiveTab("participated")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition
+              ${activeTab === "participated"
+                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                : "text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-slate-600"
+              }`}
+          >
+            <FaClipboardList /> Participated
+          </button>
+          <button
+            onClick={() => setActiveTab("winning")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition
+              ${activeTab === "winning"
+                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                : "text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-slate-600"
+              }`}
+          >
+            <FaTrophy /> Winning
+          </button>
+        </div>
+
+        {/* Tab Content */}
         <div className="p-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="flex flex-col gap-2">
-              <span className="font-semibold text-gray-700 dark:text-gray-200">Full Name</span>
-              <span className="text-gray-900 dark:text-gray-100">{userData?.name}</span>
+          {activeTab === "participated" && (
+            <div className="text-center text-gray-600 dark:text-gray-300">
+              <ParticipatedContests />
             </div>
-            <div className="flex flex-col gap-2">
-              <span className="font-semibold text-gray-700 dark:text-gray-200">Email</span>
-              <span className="text-gray-900 dark:text-gray-100">{userData?.email}</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <span className="font-semibold text-gray-700 dark:text-gray-200">Role</span>
-              <span className="text-gray-900 dark:text-gray-100">{userData?.role}</span>
-            </div>
-          </div>
-        </div>
+          )}
 
+          {activeTab === "winning" && (
+            <div className="text-center text-gray-600 dark:text-gray-300">
+              <WinningContests />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default CreatorProfile;
+export default UserDashboard;
+
