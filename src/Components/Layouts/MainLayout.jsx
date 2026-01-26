@@ -7,8 +7,8 @@ const MainLayout = () => {
      <>
       <Navbar />
 
-      <div className="pt-16">
-        <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="pt-2">
+        <div className="w-full max-w-[1280px] mx-auto px-2 sm:px-4 lg:px-4">
           <Outlet />
           <Footer />
         </div>

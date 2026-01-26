@@ -1,10 +1,12 @@
 import React from 'react';
-import NavBar from '../../Components/Shared-Components/NavBar';
+import Banner from './Banner';
+import PopularContests from './PopularContests';
 
 const Home = () => {
     return (
         <div className='max-w-7xl mx-auto'>
-            <h1>This is home Page</h1>
+            <Banner></Banner>
+            <PopularContests></PopularContests>
         </div>
     );
 };
