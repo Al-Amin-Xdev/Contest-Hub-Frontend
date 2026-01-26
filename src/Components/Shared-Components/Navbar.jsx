@@ -102,7 +102,7 @@ const Navbar = () => {
                   {/* Edit Profile */}
                   {user && (
                     <NavLink
-                      to="/edit-profile"
+                      to="/dashboard/profile"
                       className={navLinkStyle}
                       onClick={() => setDropdownOpen(false)}
                     >

@@ -6,7 +6,7 @@ import RoleRoute from "./RoleRoute";
 
 // Pages
 import Home from "../Pages/Home/Home";
-import AllContest from "../Pages/AllContests/AllContest";
+
 import ContestDetails from "../Pages/ContestDetails/ContestDetails";
 import Leaderboard from "../Pages/Leaderboard/Leaderboard";
 import Login from "../Pages/Auth/Login";
@@ -23,6 +23,7 @@ import Submissions from "../Components/Dashboard/Creator/Submissions";
 import ManageUsers from "../Components/Dashboard/Admin/ManageUsers";
 import ManageContests from "../Components/Dashboard/Admin/ManageContests";
 import ExtraSection from "../Pages/Home/ExtraSection";
+import AllContests from "../Pages/AllContests/AllContest";
 
 const router = createBrowserRouter([
   {
@@ -31,7 +32,7 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
     children: [
       { path: "/", element: <Home /> },
-      { path: "/contests", element: <AllContest /> },
+      { path: "/contests", element: <AllContests></AllContests> },
       {
         path: "/contest/:id",
         element: (
