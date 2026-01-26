@@ -7,13 +7,13 @@ import useAxios from "../../Hooks/useAxios";
 import useRole from "../../Hooks/useRole";
 
 const Login = () => {
-  const { login, PopUpLogIn, setUser } =
-    useContext(AuthContext);
+  const { login, PopUpLogIn, setUser, resetPassword } = useContext(AuthContext);
 
   const axiosInstance = useAxios();
   const { role, loading: roleLoading } = useRole();
 
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -60,9 +60,7 @@ const Login = () => {
       Swal.fire({
         icon: "success",
         title: "Login Successful",
-        text: `Welcome back, ${
-          userInfo.user.displayName || "Contestant"
-        }! ✅`,
+        text: `Welcome back, ${userInfo.user.displayName || "Contestant"}! ✅`,
         timer: 2000,
         showConfirmButton: false,
       });
@@ -73,9 +71,7 @@ const Login = () => {
       Swal.fire({
         icon: "error",
         title: "Login Failed",
-        text:
-          firebaseErrorMap[error.code] ||
-          "Login failed. Please try again",
+        text: firebaseErrorMap[error.code] || "Login failed. Please try again",
         timer: 2500,
         showConfirmButton: false,
       });
@@ -95,9 +91,7 @@ const Login = () => {
       let role;
 
       try {
-        const { data } = await axiosInstance.get(
-          `/user-role/${user.uid}`
-        );
+        const { data } = await axiosInstance.get(`/user-role/${user.uid}`);
         role = data?.role;
       } catch {
         console.log("No role found, selecting role...");
@@ -158,21 +152,62 @@ const Login = () => {
     }
   };
 
+  //Reset Pass
+  // Handle Reset Password
+  const handleResetPassword = async () => {
+    if (!email) {
+      Swal.fire({
+        icon: "info",
+        title: "Reset Password",
+        text: "Please enter your email first!",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await resetPassword(email);
+      Swal.fire({
+        icon: "success",
+        title: "Email Sent",
+        text: "A password reset link has been sent to your email.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text:
+          error.code === "auth/user-not-found"
+            ? "No account found with this email."
+            : "Failed to send reset email.",
+        timer: 2500,
+        showConfirmButton: false,
+      });
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-700 to-purple-700 text-white justify-center items-center p-16">
         <div className="max-w-md">
           <h1 className="text-5xl font-bold mb-4">Welcome Back 🎉</h1>
           <p className="text-lg opacity-90">
-            Log in to ContestHub to participate, create, and manage
-            exciting contests.
+            Log in to ContestHub to participate, create, and manage exciting
+            contests.
           </p>
         </div>
       </div>
 
       <div className="flex flex-1 justify-center items-center p-6 bg-gray-50 dark:bg-slate-900">
         <div className="w-full max-w-md bg-white dark:bg-slate-700 rounded-3xl shadow-2xl p-10">
-          <h2 className="text-3xl font-bold text-center mb-6">
+          <h2 className="text-3xl font-bold text-center mb-6  text-white">
             Sign In
           </h2>
 
@@ -181,6 +216,8 @@ const Login = () => {
               type="email"
               name="email"
               placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
               className="input input-bordered w-full"
             />
@@ -201,6 +238,16 @@ const Login = () => {
             </button>
           </form>
 
+          {/* Forgot Password */}
+          <div className="text-center mt-4">
+            <button
+              onClick={handleResetPassword}
+              className="text-md hover:text-blue-600 text-white font-medium transition"
+            >
+              Forgot Password?
+            </button>
+          </div>
+
           <div className="divider  text-white my-6">OR</div>
 
           <button
@@ -208,7 +255,10 @@ const Login = () => {
             disabled={loading}
             className="btn btn-outline w-full flex gap-2 bg-black"
           >
-            <FcGoogle size={22} /> <span className="font-bold text-lg text-white">Continue with Google</span>
+            <FcGoogle size={22} />{" "}
+            <span className="font-bold text-lg text-white">
+              Continue with Google
+            </span>
           </button>
 
           <p className="text-center text-sm mt-6  text-white">
