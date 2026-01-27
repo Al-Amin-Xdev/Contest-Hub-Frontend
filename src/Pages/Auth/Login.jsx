@@ -3,14 +3,16 @@ import Swal from "sweetalert2";
 import { FcGoogle } from "react-icons/fc";
 import { useContext, useState, useEffect } from "react";
 import AuthContext from "../../providers/AuthContext";
-import useAxios from "../../Hooks/useAxios";
+// import useAxios from "../../Hooks/useAxios";
 import useRole from "../../Hooks/useRole";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
 
 const Login = () => {
   const { login, PopUpLogIn, setUser, resetPassword } = useContext(AuthContext);
 
-  const axiosInstance = useAxios();
+  // const axiosInstance = useAxios();
   const { role, loading: roleLoading } = useRole();
+  const axiosSecure = useAxiosSecure();
 
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -61,7 +63,7 @@ const Login = () => {
         icon: "success",
         title: "Login Successful",
         text: `Welcome back, ${userInfo.user.displayName || "Contestant"}! ✅`,
-        timer: 2000,
+        timer: 1000,
         showConfirmButton: false,
       });
 
@@ -91,7 +93,7 @@ const Login = () => {
       let role;
 
       try {
-        const { data } = await axiosInstance.get(`/user-role/${user.uid}`);
+        const { data } = await axiosSecure.get(`/user-role/${user.uid}`);
         role = data?.role;
       } catch {
         console.log("No role found, selecting role...");
@@ -118,7 +120,7 @@ const Login = () => {
 
         role = selectedRole;
 
-        await axiosInstance.post("/user-role", {
+        await axiosSecure.post("/user-role", {
           uid: user.uid,
           name: user.displayName,
           email: user.email,

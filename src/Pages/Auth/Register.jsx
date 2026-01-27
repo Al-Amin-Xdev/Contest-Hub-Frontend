@@ -3,11 +3,15 @@ import Swal from "sweetalert2";
 import { useContext, useState } from "react";
 import { NavLink } from "react-router-dom";
 import AuthContext from "../../providers/AuthContext";
-import useAxios from "../../Hooks/useAxios";
+// import useAxios from "../../Hooks/useAxios";
+import { useNavigate } from "react-router";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
 
 const Register = () => {
   const { register, setUser } = useContext(AuthContext);
-  const axiosInstance = useAxios(); // Axios instance with baseURL
+  // const axiosInstance = useAxios(); // Axios instance with baseURL
+  const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
   const [loading, setBtnLoading] = useState(false);
   const [role, setRole] = useState("user"); // default role
 
@@ -37,7 +41,7 @@ const Register = () => {
       });
 
       // 4️⃣ Send user data to backend
-      await axiosInstance.post("/user-role", {
+      await axiosSecure.post("/user-role", {
         uid: userInfo.user.uid,
         name,
         email,
@@ -49,9 +53,10 @@ const Register = () => {
         icon: "success",
         title: "Registration Successful",
         text: "Your account has been created ✅",
-        timer: 2000,
+        timer: 1000,
         showConfirmButton: false,
       });
+      navigate("/"); // Redirect to home after registration
 
       // Reset form and role state
       form.reset();

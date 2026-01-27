@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import { FaEdit } from "react-icons/fa";
 import Swal from "sweetalert2";
-
-import useAxios from "../../../Hooks/useAxios";
 import AuthContext from "../../../providers/AuthContext";
 import Loading from "../../Shared-Components/Loader";
+import useAxiosSecure from "../../../Hooks/useAxiosSecure";
+
 
 const Admin= () => {
   const { user: currentUser } = useContext(AuthContext);
-  const axios = useAxios();
+    const axiosSecure = useAxiosSecure();
 
   const [adminData, setAdminData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ const Admin= () => {
     const fetchAdmin = async () => {
       try {
         setLoading(true);
-        const { data } = await axios.get(`/user-role/${currentUser.uid}`);
+        const { data } = await axiosSecure.get(`/user-role/${currentUser.uid}`);
         setAdminData(data);
       } catch (error) {
         console.error("Fetch Admin Error:", error);
@@ -35,62 +35,62 @@ const Admin= () => {
     };
 
     fetchAdmin();
-  }, [currentUser?.uid, axios]);
+  }, [currentUser?.uid, axiosSecure]);
 
-  // Edit Admin Profile
+ 
   const handleEditProfile = async () => {
-    const { value: formValues } = await Swal.fire({
-      title: "Edit Admin Profile",
-      html: `
-        <input id="swal-name" class="swal2-input" placeholder="Full Name" value="${adminData?.name || ''}">
-        <input id="swal-photo" class="swal2-input" placeholder="Photo URL" value="${adminData?.photoURL || ''}">
-      `,
-      focusConfirm: false,
-      showCancelButton: true,
-      preConfirm: () => {
-        const name = document.getElementById("swal-name").value.trim();
-        const photoURL = document.getElementById("swal-photo").value.trim();
+  const { value: formValues } = await Swal.fire({
+    title: "Edit Admin Profile",
+    html: `
+      <input id="swal-name" class="swal2-input" placeholder="Full Name" value="${adminData?.name || ''}">
+      <input id="swal-photo" class="swal2-input" placeholder="Photo URL" value="${adminData?.photoURL || ''}">
+    `,
+    focusConfirm: false,
+    showCancelButton: true,
+    preConfirm: () => {
+      const name = document.getElementById("swal-name").value.trim();
+      const photoURL = document.getElementById("swal-photo").value.trim();
 
-        if (!name || !photoURL) {
-          Swal.showValidationMessage("All fields are required");
-        }
-        return { name, photoURL };
-      },
-    });
-
-    if (formValues) {
-      try {
-        await axios.post("/user-role", {
-          uid: currentUser.uid,
-          name: formValues.name,
-          email: formValues.email,
-          photoURL: formValues.photoURL,
-          role: "Admin",
-        });
-
-        setAdminData((prev) => ({
-          ...prev,
-          name: formValues.name,
-          email: formValues.email,
-          photoURL: formValues.photoURL,
-        }));
-
-        Swal.fire({
-          icon: "success",
-          title: "Profile Updated ✅",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      } catch (error) {
-        console.error("Update Error:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Update Failed",
-          text: error.message,
-        });
+      if (!name || !photoURL) {
+        Swal.showValidationMessage("All fields are required");
       }
+      return { name, photoURL };
+    },
+  });
+
+  if (formValues) {
+    try {
+      await axiosSecure.post("/user-role", {
+        uid: currentUser.uid,
+        name: formValues.name,
+        email: adminData.email, // ⚠️ FIXED
+        photoURL: formValues.photoURL,
+        role: "Admin",
+      });
+
+      setAdminData((prev) => ({
+        ...prev,
+        name: formValues.name,
+        photoURL: formValues.photoURL,
+      }));
+
+      Swal.fire({
+        icon: "success",
+        title: "Profile Updated ✅",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Update Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: error.message,
+      });
     }
-  };
+  }
+};
+
 
   if (loading) {
     return (
