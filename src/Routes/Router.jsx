@@ -29,6 +29,7 @@ import Admin from "../Components/Dashboard/Admin/Admin";
 import AdminDashboard from "../Components/Dashboard/Admin/AdminDashboard";
 import CreatorDashboard from "../Components/Dashboard/Creator/CreatorDashboard";
 import UserDashboard from "../Components/Dashboard/User/UserDashboard";
+import RoleRequest from "../Components/Dashboard/Admin/RoleRequest";
 
 
 const router = createBrowserRouter([
@@ -147,6 +148,14 @@ const router = createBrowserRouter([
         element: (
           <RoleRoute role="admin">
             <ManageContests />
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "role-requests",
+        element: (
+          <RoleRoute role="admin">
+            <RoleRequest></RoleRequest>
           </RoleRoute>
         ),
       },

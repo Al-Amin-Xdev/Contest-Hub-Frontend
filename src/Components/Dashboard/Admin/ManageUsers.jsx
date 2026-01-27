@@ -1,150 +1,114 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Swal from "sweetalert2";
+import useAxios from "../../../Hooks/useAxios";
+import AuthContext from "../../../providers/AuthContext";
 
 const ManageUsers = () => {
-  // Dummy data (replace with API fetch)
-  const [users, setUsers] = useState([
-    { id: 1, name: "Alice Johnson", email: "alice@example.com", role: "User" },
-    { id: 2, name: "Bob Smith", email: "bob@example.com", role: "Creator" },
-    { id: 3, name: "Charlie Brown", email: "charlie@example.com", role: "Admin" },
-    { id: 4, name: "Diana Prince", email: "diana@example.com", role: "User" },
-    { id: 5, name: "Ethan Hunt", email: "ethan@example.com", role: "Creator" },
-  ]);
+  const axios = useAxios();
+  const { user } = useContext(AuthContext);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Handle role change with confirmation modal
-  const handleRoleChange = (userId, newRole) => {
-    const user = users.find(u => u.id === userId);
-    if (!user) return;
+  // Fetch all users
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const { data } = await axios.get("/user-roles"); 
+        setUsers(data);
+      } catch (error) {
+        Swal.fire("Error", "Failed to load users", "error");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUsers();
+  }, [axios]);
 
-    Swal.fire({
-      title: `Change role for ${user.name}?`,
-      text: `Role will change from ${user.role} → ${newRole}`,
+  // Delete a user
+  const handleDelete = async (uid) => {
+    const confirm = await Swal.fire({
+      title: "Are you sure?",
+      text: "This will permanently delete the user!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, change it!",
-      cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setUsers(prevUsers =>
-          prevUsers.map(u =>
-            u.id === userId ? { ...u, role: newRole, rejected: newRole !== "Admin" && u.rejected !== true } : u
-          )
-        );
-
-        Swal.fire({
-          icon: "success",
-          title: `Role changed to ${newRole}`,
-          timer: 1500,
-          showConfirmButton: false,
-        });
-
-        // TODO: Call backend API to save role change
-        console.log(`User ID ${userId} role changed to ${newRole}`);
-      }
+      confirmButtonText: "Delete",
     });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await axios.delete(`/user-role/${uid}`);
+      setUsers((prev) => prev.filter((u) => u.uid !== uid));
+      Swal.fire("Deleted!", "User has been deleted.", "success");
+    } catch {
+      Swal.fire("Error", "Admin can not be deleted", "error");
+    }
   };
 
-  return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
-        Manage Users
-      </h2>
+  if (loading) {
+    return <div className="p-6 text-center">Loading users...</div>;
+  }
 
-      {/* Desktop Table */}
-      <div className="overflow-x-auto hidden sm:block">
-        <table className="min-w-full table-fixed border-collapse bg-white dark:bg-slate-800 shadow rounded-xl overflow-hidden">
-          <thead className="bg-gray-100 dark:bg-slate-700">
-            <tr>
-              <th className="w-10 text-left p-4 text-gray-700 dark:text-gray-200 font-semibold text-sm">#</th>
-              <th className="w-1/4 text-left p-4 text-gray-700 dark:text-gray-200 font-semibold text-sm">Name</th>
-              <th className="w-1/4 text-left p-4 text-gray-700 dark:text-gray-200 font-semibold text-sm">Email</th>
-              <th className="w-1/6 text-left p-4 text-gray-700 dark:text-gray-200 font-semibold text-sm">Role</th>
-              <th className="w-1/4 text-left p-4 text-gray-700 dark:text-gray-200 font-semibold text-sm">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user, index) => (
-              <tr
-                key={user.id}
-                className={`border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-slate-700 transition`}
-              >
-                <td className="p-4 text-gray-700 dark:text-gray-200">{index + 1}</td>
-                <td className="p-4 text-gray-700 dark:text-gray-200">{user.name}</td>
-                <td className="p-4 text-gray-700 dark:text-gray-200">{user.email}</td>
-                <td className="p-4">
-                  <select
-                    value={user.role}
-                    onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                    className="border rounded-md px-3 py-1 text-gray-700 dark:text-gray-200 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition"
-                  >
-                    <option value="User">User</option>
-                    <option value="Creator">Creator</option>
-                    <option value="Admin">Admin</option>
-                  </select>
-                </td>
-                <td className="p-4 flex flex-wrap justify-end gap-2">
-                  <button
-                    className={`${
-                      user.rejected ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-500 hover:bg-green-600"
-                    } text-white px-3 py-1 rounded-md text-sm transition`}
-                    onClick={() => console.log(`${user.rejected ? "Rejected" : "Approved"} User ID ${user.id}`)}
-                  >
-                    {user.rejected ? "Reject" : "Approve"}
-                  </button>
-                  {!user.rejected && (
+  return (
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-6">Manage Users</h2>
+
+      {users.length === 0 ? (
+        <p className="text-gray-500">No users found</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white dark:bg-slate-800 rounded-xl shadow">
+            <thead className="bg-gray-100 dark:bg-slate-700">
+              <tr>
+                <th className="p-4 text-left text-white font-bold">User</th>
+                <th className="p-4 text-left text-white font-bold">Email</th>
+                <th className="p-4 text-left text-white font-bold">Role</th>
+                <th className="p-4 text-center text-white font-bold">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.uid} className="border-t">
+                  {/* User Name + Photo */}
+                  <td className="p-4 flex items-center gap-3">
+                    {u.photoURL ? (
+                      <img
+                        src={u.photoURL}
+                        alt={u.name}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center text-white">
+                        {u.name?.[0] || "U"}
+                      </div>
+                    )}
+                    <span className="font-medium text-white">{u.name}</span>
+                  </td>
+
+                  {/* Email */}
+                  <td className="p-4 text-white">{u.email}</td>
+
+                  {/* Role */}
+                  <td className="p-4 text-white font-semibold">{u.role}</td>
+
+                  {/* Delete Button */}
+                  <td className="p-4 flex justify-center">
                     <button
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm transition"
-                      onClick={() => console.log(`User ID ${user.id} deleted`)}
+                      onClick={() => handleDelete(u.uid)}
+                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                     >
                       Delete
                     </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile Cards */}
-      <div className="sm:hidden mt-6 space-y-4">
-        {users.map((user) => (
-          <div key={user.id} className="bg-gray-100 dark:bg-slate-700 p-4 rounded-xl shadow">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="font-semibold text-gray-700 dark:text-gray-200">{user.name}</h3>
-              <span className="text-sm text-gray-500 dark:text-gray-300">{user.role}</span>
-            </div>
-            <p className="text-gray-700 dark:text-gray-200 mb-2">{user.email}</p>
-            <div className="flex flex-wrap gap-2 justify-end">
-              <select
-                value={user.role}
-                onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                className="border rounded-md px-3 py-1 text-gray-700 dark:text-gray-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition"
-              >
-                <option value="User">User</option>
-                <option value="Creator">Creator</option>
-                <option value="Admin">Admin</option>
-              </select>
-              <button
-                className={`${user.rejected ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-500 hover:bg-green-600"} text-white px-3 py-1 rounded-md text-sm transition`}
-                onClick={() => console.log(`${user.rejected ? "Rejected" : "Approved"} User ID ${user.id}`)}
-              >
-                {user.rejected ? "Reject" : "Approve"}
-              </button>
-              {!user.rejected && (
-                <button
-                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm transition"
-                  onClick={() => console.log(`User ID ${user.id} deleted`)}
-                >
-                  Delete
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
 
 export default ManageUsers;
+
