@@ -5,138 +5,223 @@ import AuthContext from "../../../providers/AuthContext";
 import Loading from "../../Shared-Components/Loader";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  RadialBarChart,
+  RadialBar,
+} from "recharts";
 
-const Admin= () => {
+const PIE_COLORS = ["#22c55e", "#facc15", "#ef4444"];
+
+const Admin = () => {
   const { user: currentUser } = useContext(AuthContext);
-    const axiosSecure = useAxiosSecure();
+  const axiosSecure = useAxiosSecure();
 
   const [adminData, setAdminData] = useState(null);
+  const [usersCount, setUsersCount] = useState(0);
+  const [activeAdmins, setActiveAdmins] = useState(0);
+  const [contestStats, setContestStats] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch admin info
+  // ================= FETCH DATA =================
   useEffect(() => {
     if (!currentUser?.uid) return;
 
-    const fetchAdmin = async () => {
+    const fetchAll = async () => {
       try {
         setLoading(true);
-        const { data } = await axiosSecure.get(`/user-role/${currentUser.uid}`);
-        setAdminData(data);
-      } catch (error) {
-        console.error("Fetch Admin Error:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Failed to load admin data",
-        });
+
+        // Admin info
+        const adminRes = await axiosSecure.get(`/user-role/${currentUser.uid}`);
+        setAdminData(adminRes.data);
+
+        // Users
+        const usersRes = await axiosSecure.get("/user-roles");
+        setUsersCount(usersRes.data.length);
+
+        // Active admins
+        const admins = usersRes.data.filter(
+          (u) => u.role?.toLowerCase() === "admin",
+        );
+        setActiveAdmins(admins.length);
+
+        // Contests
+        const contestsRes = await axiosSecure.get("/all-contests");
+
+        const confirmed = contestsRes.data.filter(
+          (c) => c.status === "confirmed",
+        ).length;
+        const pending = contestsRes.data.filter(
+          (c) => c.status === "pending",
+        ).length;
+        const rejected = contestsRes.data.filter(
+          (c) => c.status === "rejected",
+        ).length;
+
+        setContestStats([
+          { name: "Confirmed", value: confirmed },
+          { name: "Pending", value: pending },
+          { name: "Rejected", value: rejected },
+        ]);
+      } catch (err) {
+        Swal.fire("Error", "Failed to load admin dashboard", "error");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAdmin();
+    fetchAll();
   }, [currentUser?.uid, axiosSecure]);
 
- 
+  // ================= EDIT PROFILE =================
   const handleEditProfile = async () => {
-  const { value: formValues } = await Swal.fire({
-    title: "Edit Admin Profile",
-    html: `
-      <input id="swal-name" class="swal2-input" placeholder="Full Name" value="${adminData?.name || ''}">
-      <input id="swal-photo" class="swal2-input" placeholder="Photo URL" value="${adminData?.photoURL || ''}">
-    `,
-    focusConfirm: false,
-    showCancelButton: true,
-    preConfirm: () => {
-      const name = document.getElementById("swal-name").value.trim();
-      const photoURL = document.getElementById("swal-photo").value.trim();
+    const { value } = await Swal.fire({
+      title: "Edit Admin Profile",
+      html: `
+        <input id="name" class="swal2-input" value="${adminData?.name || ""}">
+        <input id="photo" class="swal2-input" value="${adminData?.photoURL || ""}">
+      `,
+      showCancelButton: true,
+      preConfirm: () => ({
+        name: document.getElementById("name").value,
+        photoURL: document.getElementById("photo").value,
+      }),
+    });
 
-      if (!name || !photoURL) {
-        Swal.showValidationMessage("All fields are required");
-      }
-      return { name, photoURL };
-    },
-  });
+    if (!value) return;
 
-  if (formValues) {
-    try {
-      await axiosSecure.post("/user-role", {
-        uid: currentUser.uid,
-        name: formValues.name,
-        email: adminData.email, // ⚠️ FIXED
-        photoURL: formValues.photoURL,
-        role: "Admin",
-      });
+    await axiosSecure.post("/user-role", {
+      uid: currentUser.uid,
+      name: value.name,
+      email: adminData.email,
+      photoURL: value.photoURL,
+      role: "Admin",
+    });
 
-      setAdminData((prev) => ({
-        ...prev,
-        name: formValues.name,
-        photoURL: formValues.photoURL,
-      }));
-
-      Swal.fire({
-        icon: "success",
-        title: "Profile Updated ✅",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-    } catch (error) {
-      console.error("Update Error:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Update Failed",
-        text: error.message,
-      });
-    }
-  }
-};
-
+    setAdminData((p) => ({ ...p, ...value }));
+    Swal.fire("Updated", "Profile updated successfully", "success");
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex justify-center items-center text-gray-500 dark:text-gray-300">
-        <Loading></Loading>
+      <div className="min-h-screen flex justify-center items-center">
+        <Loading />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex justify-center items-center p-4">
-      <div className="max-w-4xl w-full bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden">
-        {/* Header with gradient */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-8 flex flex-col sm:flex-row items-center gap-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 p-6">
+      <div className="max-w-6xl mx-auto bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden">
+        {/* HEADER */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-8 flex items-center gap-6">
           <img
-            src={adminData?.photoURL || "https://via.placeholder.com/150"}
-            alt={adminData?.name}
-            className="w-32 h-32 rounded-full border-4 border-white object-cover"
+            src={adminData?.photoURL}
+            className="w-28 h-28 rounded-full border-4 border-white object-cover"
           />
-          <div className="flex-1 text-center sm:text-left">
-            <h2 className="text-3xl font-bold text-white flex items-center justify-center sm:justify-start gap-3">
+          <div>
+            <h2 className="text-3xl font-bold text-white flex gap-3">
               {adminData?.name}
-              <FaEdit
-                className="cursor-pointer hover:text-gray-200"
-                onClick={handleEditProfile}
-                title="Edit Profile"
-              />
+              <FaEdit onClick={handleEditProfile} className="cursor-pointer" />
             </h2>
-            <p className="text-white/90 mt-1">{adminData?.email}</p>
-            <p className="text-white/80 mt-2 text-lg font-bold">Admin</p>
+            <p className="text-white/90 break-all sm:break-words max-w-full">
+              {adminData?.email}
+            </p>
+
+            <p className="text-white font-semibold mt-1">Admin</p>
           </div>
         </div>
 
-        {/* Info Cards */}
-        <div className="p-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="bg-gray-100 dark:bg-slate-700 rounded-2xl p-4 text-center shadow hover:scale-105 transform transition">
-            <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">Total Users</h3>
-            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">123</p>
+        {/* STATS GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8">
+          {/* TOTAL USERS - BAR CHART */}
+          <div className="bg-gray-100 dark:bg-slate-700 rounded-2xl p-6 shadow">
+            <h3 className="text-center font-semibold text-gray-800 dark:text-gray-100 mb-4">
+              Total Users
+            </h3>
+
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={[{ name: "Users", value: usersCount }]}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
-          <div className="bg-gray-100 dark:bg-slate-700 rounded-2xl p-4 text-center shadow hover:scale-105 transform transition">
-            <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">Total Contests</h3>
-            <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">45</p>
+
+          {/* ACTIVE ADMINS - RADIAL */}
+          <div className="bg-gray-100 dark:bg-slate-700 rounded-2xl p-6 shadow flex flex-col items-center justify-center">
+            <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-2">
+              Active Admins
+            </h3>
+
+            <ResponsiveContainer width="100%" height={200}>
+              <RadialBarChart
+                innerRadius="70%"
+                outerRadius="100%"
+                data={[{ name: "Admins", value: activeAdmins }]}
+                startAngle={90}
+                endAngle={-270}
+              >
+                <RadialBar dataKey="value" fill="#22c55e" cornerRadius={10} />
+                <Tooltip />
+              </RadialBarChart>
+            </ResponsiveContainer>
+
+            <p className="text-2xl font-bold text-green-600 mt-2">
+              {activeAdmins}
+            </p>
           </div>
-          <div className="bg-gray-100 dark:bg-slate-700 rounded-2xl p-4 text-center shadow hover:scale-105 transform transition">
-            <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">Active Admins</h3>
-            <p className="text-2xl font-bold text-green-600 dark:text-green-400">3</p>
+          {/* CONTEST STATUS - PIE */}
+          <div className="bg-gray-100 dark:bg-slate-700 rounded-2xl p-6 shadow">
+            <h3 className="text-center font-semibold text-gray-800 dark:text-gray-100 mb-4">
+              Contest Status
+            </h3>
+
+            {/* Pie Chart Container */}
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie
+                  data={contestStats}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={50}
+                  outerRadius={80}
+                  paddingAngle={2}
+                >
+                  {contestStats.map((_, i) => (
+                    <Cell key={i} fill={PIE_COLORS[i]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                {/* No Legend inside chart */}
+              </PieChart>
+            </ResponsiveContainer>
+
+            {/* Custom Legend with Counts */}
+            <div className="flex justify-center gap-6 mt-4 flex-wrap">
+              {contestStats.map((item, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span
+                    className="w-4 h-4 rounded-full"
+                    style={{ backgroundColor: PIE_COLORS[i] }}
+                  />
+                  <span className="text-gray-700 dark:text-gray-200 font-medium">
+                    {item.name} ({item.value})
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
