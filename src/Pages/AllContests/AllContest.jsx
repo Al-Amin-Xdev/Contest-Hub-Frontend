@@ -1,131 +1,318 @@
-import React, { useState } from "react";
+// import React, { useEffect, useMemo, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import useAxiosSecure from "../../Hooks/useAxiosSecure";
+
+
+// const AllContests = () => {
+//   const navigate = useNavigate();
+//   const axiosSecure = useAxiosSecure();
+
+//   const [contests, setContests] = useState([]);
+//   const [activeTab, setActiveTab] = useState("All");
+//   const [loading, setLoading] = useState(true);
+
+//   // 🔹 Fetch contests
+//   useEffect(() => {
+//     const fetchContests = async () => {
+//       try {
+//         const res = await axiosSecure.get("/all-contests");
+
+//         // ✅ Only confirmed contests
+//         const confirmedContests = res.data.filter(
+//           (contest) => contest.status === "confirmed"
+//         );
+
+//         setContests(confirmedContests);
+//       } catch (error) {
+//         console.error("Failed to load contests", error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchContests();
+//   }, [axiosSecure]);
+
+//   // 🔹 Create category tabs from contestType
+//   const contestCategories = useMemo(() => {
+//     const categories = contests
+//       .map((contest) => contest.contestType)
+//       .filter(Boolean);
+
+//     return ["All", ...new Set(categories)];
+//   }, [contests]);
+
+//   // 🔹 Filter contests by selected category
+//   const filteredContests =
+//     activeTab === "All"
+//       ? contests
+//       : contests.filter(
+//           (contest) => contest.contestType === activeTab
+//         );
+
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center text-xl font-semibold">
+//         Loading contests...
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <section className="py-16 sm:py-20 bg-gray-50 dark:bg-slate-900 min-h-screen">
+//       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+//         {/* Header */}
+//         <div className="text-center mb-10 sm:mb-12">
+//           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">
+//             All Contests 🎯
+//           </h2>
+//           <p className="mt-3 sm:mt-4 text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-sm sm:text-base">
+//             Discover exciting contests — explore details to unlock full information.
+//           </p>
+//         </div>
+
+//         {/* Category Tabs */}
+//         <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8 sm:mb-10">
+//           {contestCategories.map((category) => (
+//             <button
+//               key={category}
+//               onClick={() => setActiveTab(category)}
+//               className={`px-4 sm:px-6 py-2 rounded-full text-sm sm:text-base font-semibold transition
+//                 ${
+//                   activeTab === category
+//                     ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+//                     : "bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700"
+//                 }`}
+//             >
+//               {category}
+//             </button>
+//           ))}
+//         </div>
+
+//         {/* Contest Cards */}
+//         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+//           {filteredContests.map((contest) => (
+//             <div
+//               key={contest._id}
+//               className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition"
+//             >
+//               {/* Image */}
+//               <div className="relative h-44 sm:h-52 overflow-hidden">
+//                 <img
+//                   src={contest.image || "https://via.placeholder.com/400x300"}
+//                   alt={contest.name}
+//                   className="w-full h-full object-cover hover:scale-110 transition duration-500"
+//                 />
+//                 <span className="absolute top-3 right-3 bg-blue-600 text-white text-xs sm:text-sm font-semibold px-3 py-1 rounded-full">
+//                   {contest.participants || 0} Joined
+//                 </span>
+//               </div>
+
+//               {/* Content */}
+//               <div className="p-5 sm:p-6">
+//                 <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2">
+//                   {contest.name}
+//                 </h3>
+
+//                 {/* 🔥 Teaser Description */}
+//                 <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed">
+//                   {contest.description?.slice(0, 60)}...
+//                   <span className="text-blue-600 font-medium ml-1">
+//                     explore →
+//                   </span>
+//                 </p>
+
+//                 {/* Minimal Info */}
+//                 <div className="flex justify-between items-center mb-4">
+//                   <span className="text-sm font-medium text-blue-600">
+//                     {contest.contestType}
+//                   </span>
+//                   <span className="text-xs text-gray-400 italic">
+//                     Details inside
+//                   </span>
+//                 </div>
+
+//                 {/* Details Button */}
+//                 <button
+//                   onClick={() => navigate(`/contest/${contest._id}`)}
+//                   className="w-full py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold hover:scale-[1.02] transition"
+//                 >
+//                   View Details
+//                 </button>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+
+//         {/* Empty State */}
+//         {filteredContests.length === 0 && (
+//           <p className="text-center text-gray-500 mt-16">
+//             No contests found for this category.
+//           </p>
+//         )}
+//       </div>
+//     </section>
+//   );
+// };
+
+// export default AllContests;
+
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
+
+
+// Countdown component
+const Countdown = ({ deadline }) => {
+  const [timeLeft, setTimeLeft] = useState("");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const end = new Date(deadline).getTime();
+      const distance = end - now;
+
+      if (distance <= 0) {
+        setTimeLeft("Contest ended");
+        clearInterval(interval);
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [deadline]);
+
+  return <span className="text-sm sm:text-base font-medium text-red-600">{timeLeft}</span>;
+};
 
 const AllContests = () => {
   const navigate = useNavigate();
+  const axiosSecure = useAxiosSecure();
 
-  // Dummy contest data (later replace with backend API)
-  const contests = [
-    {
-      id: 1,
-      name: "Creative Logo Design Challenge",
-      type: "Image Design",
-      image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb",
-      participants: 320,
-      description:
-        "Design a modern and creative logo for a startup brand. Showcase your creativity and design skills.",
-    },
-    {
-      id: 2,
-      name: "Article Writing Competition",
-      type: "Article Writing",
-      image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f",
-      participants: 280,
-      description:
-        "Write a compelling and insightful article on emerging technology trends and their impact on society.",
-    },
-    {
-      id: 3,
-      name: "Mobile App UI Design Contest",
-      type: "Image Design",
-      image: "https://images.unsplash.com/photo-1551650975-87deedd944c3",
-      participants: 410,
-      description:
-        "Create a stunning and user-friendly mobile app UI that delivers a seamless user experience.",
-    },
-    {
-      id: 4,
-      name: "Gaming Review Challenge",
-      type: "Article Writing",
-      image: "https://images.unsplash.com/photo-1542751371-adc38448a05e",
-      participants: 190,
-      description:
-        "Share your honest and detailed review of a popular video game and help gamers make better choices.",
-    },
-    {
-      id: 5,
-      name: "Business Idea Pitch Contest",
-      type: "Business Ideas",
-      image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d",
-      participants: 260,
-      description:
-        "Pitch an innovative business idea that solves real-world problems and has strong market potential.",
-    },
-  ];
-
-  // Get unique contest types for tabs
-  const contestTypes = ["All", ...new Set(contests.map((c) => c.type))];
-
+  const [contests, setContests] = useState([]);
   const [activeTab, setActiveTab] = useState("All");
+  const [loading, setLoading] = useState(true);
 
-  // Filter contests based on active tab
-  const filteredContests =
-    activeTab === "All"
-      ? contests
-      : contests.filter((c) => c.type === activeTab);
+  // Fetch contests
+  useEffect(() => {
+    const fetchContests = async () => {
+      try {
+        const res = await axiosSecure.get("/all-contests");
+
+        // Only confirmed contests
+        const confirmedContests = res.data.filter(c => c.status === "confirmed");
+        setContests(confirmedContests);
+      } catch (error) {
+        console.error("Failed to load contests", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchContests();
+  }, [axiosSecure]);
+
+  // Category tabs
+  const contestCategories = useMemo(() => {
+    const categories = contests.map(c => c.contestType).filter(Boolean);
+    return ["All", ...new Set(categories)];
+  }, [contests]);
+
+  // Filter by category
+  const filteredContests = activeTab === "All"
+    ? contests
+    : contests.filter(c => c.contestType === activeTab);
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center text-xl font-semibold">
+      Loading contests...
+    </div>
+  );
 
   return (
-    <section className="py-20 bg-gray-50 dark:bg-slate-900 min-h-screen">
+    <section className="py-16 sm:py-20 bg-gray-50 dark:bg-slate-900 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Page Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">
+        {/* Header */}
+        <div className="text-center mb-10 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">
             All Contests 🎯
           </h2>
-          <p className="mt-4 text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Browse all approved contests. Filter by contest type to find what interests you most.
+          <p className="mt-3 sm:mt-4 text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-sm sm:text-base">
+            Discover exciting contests — explore details to unlock full information.
           </p>
         </div>
 
-        {/* Tabs */}
-        <div className="flex flex-wrap justify-center gap-4 mb-10">
-          {contestTypes.map((type) => (
+        {/* Category Tabs */}
+        <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8 sm:mb-10">
+          {contestCategories.map(category => (
             <button
-              key={type}
-              onClick={() => setActiveTab(type)}
-              className={`px-6 py-2 rounded-full font-semibold transition
-                ${
-                  activeTab === type
-                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                    : "bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700"
+              key={category}
+              onClick={() => setActiveTab(category)}
+              className={`px-4 sm:px-6 py-2 rounded-full text-sm sm:text-base font-semibold transition
+                ${activeTab === category
+                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                  : "bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700"
                 }`}
             >
-              {type}
+              {category}
             </button>
           ))}
         </div>
 
-        {/* Contests Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredContests.map((contest) => (
+        {/* Contest Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {filteredContests.map(contest => (
             <div
-              key={contest.id}
-              className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition group"
+              key={contest._id}
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition"
             >
-              {/* Contest Image */}
-              <div className="relative h-52 overflow-hidden">
+              {/* Image */}
+              <div className="relative h-44 sm:h-52 overflow-hidden">
                 <img
-                  src={contest.image}
+                  src={contest.image || "https://via.placeholder.com/400x300"}
                   alt={contest.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                  className="w-full h-full object-cover hover:scale-110 transition duration-500"
                 />
-                <span className="absolute top-4 right-4 bg-blue-600 text-white text-sm font-semibold px-3 py-1 rounded-full shadow">
-                  {contest.participants} Joined
+                <span className="absolute top-3 right-3 bg-blue-600 text-white text-xs sm:text-sm font-semibold px-3 py-1 rounded-full">
+                  {contest.participants || 0} Joined
                 </span>
               </div>
 
-              {/* Contest Content */}
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              {/* Content */}
+              <div className="p-5 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2">
                   {contest.name}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 text-sm mb-5">
-                  {contest.description.slice(0, 90)}...
+
+                {/* Teaser Description */}
+                <p className="text-gray-600 dark:text-gray-300 text-sm mb-2 leading-relaxed">
+                  {contest.description?.slice(0, 60)}...
+                  <span className="text-blue-600 font-medium ml-1">
+                    explore →
+                  </span>
                 </p>
+
+                {/* Minimal Info + Countdown */}
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-sm font-medium text-blue-600">
+                    {contest.contestType}
+                  </span> 
+                  <span className="text-white">Contest ends in:</span>
+                  <Countdown deadline={contest.deadline} />
+                </div>
+
+                {/* Details Button */}
                 <button
-                  onClick={() => navigate(`/contest/${contest.id}`)} // Later, add login check
-                  className="w-full py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold hover:scale-105 transition"
+                  onClick={() => navigate(`/contest/${contest._id}`)}
+                  className="w-full py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold hover:scale-[1.02] transition"
                 >
                   View Details
                 </button>
@@ -134,9 +321,16 @@ const AllContests = () => {
           ))}
         </div>
 
+        {/* Empty State */}
+        {filteredContests.length === 0 && (
+          <p className="text-center text-gray-500 mt-16">
+            No contests found for this category.
+          </p>
+        )}
       </div>
     </section>
   );
 };
 
 export default AllContests;
+

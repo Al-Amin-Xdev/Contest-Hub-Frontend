@@ -105,7 +105,7 @@ const Navbar = () => {
                       />
                       <div>
                         <p className="font-bold text-white">{user.displayName || "User"}</p>
-                        <p className="text-sm text-gray-300">{user.email}</p>
+                        <p className="text-[10px] text-wrap text-gray-300">{user.email}</p>
                       </div>
                     </div>
                   )}
