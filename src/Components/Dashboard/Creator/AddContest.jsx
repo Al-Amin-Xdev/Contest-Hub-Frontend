@@ -162,6 +162,7 @@ const AddContest = () => {
               <option value="writing">Writing</option>
               <option value="business">Business Idea</option>
               <option value="gaming">Gaming</option>
+              <option value="gaming">Others</option>
             </select>
             {errors.contestType && <p className="text-red-500 text-sm mt-1">{errors.contestType.message}</p>}
           </div>
