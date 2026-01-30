@@ -1,5 +1,6 @@
 import React from "react";
 import { FaTrophy, FaUsers, FaLightbulb, FaLaptopCode } from "react-icons/fa";
+import { NavLink } from "react-router";
 
 const ExtraSection = () => {
   const features = [
@@ -67,9 +68,12 @@ const ExtraSection = () => {
 
         {/* CTA Button */}
         <div className="mt-16 text-center">
+          <NavLink to="/contests">
           <button className="px-10 py-3 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold hover:scale-105 transition">
             Explore Contests Now
           </button>
+          </NavLink>
+          
         </div>
 
       </div>

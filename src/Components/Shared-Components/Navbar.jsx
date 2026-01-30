@@ -76,6 +76,7 @@ const Navbar = () => {
               <NavLink to="/" className={navLinkStyle}>Home</NavLink>
               <NavLink to="/contests" className={navLinkStyle}>All Contests</NavLink>
               <NavLink to="/extra" className={navLinkStyle}>Extra Section</NavLink>
+              <NavLink to="/leaderboard" className={navLinkStyle}>Leaderboard</NavLink>
             </div>
 
             {/* Profile Avatar */}

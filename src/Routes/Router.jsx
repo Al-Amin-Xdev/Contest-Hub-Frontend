@@ -8,7 +8,6 @@ import RoleRoute from "./RoleRoute";
 import Home from "../Pages/Home/Home";
 
 import ContestDetails from "../Pages/ContestDetails/ContestDetails";
-import Leaderboard from "../Pages/Leaderboard/Leaderboard";
 import Login from "../Pages/Auth/Login";
 import Register from "../Pages/Auth/Register";
 import NotFound from "../Pages/Error/NotFound";
@@ -30,6 +29,7 @@ import AdminDashboard from "../Components/Dashboard/Admin/AdminDashboard";
 import CreatorDashboard from "../Components/Dashboard/Creator/CreatorDashboard";
 import UserDashboard from "../Components/Dashboard/User/UserDashboard";
 import RoleRequest from "../Components/Dashboard/Admin/RoleRequest";
+import Leaderboard from "../Pages/Leaderboard/Leaderboard";
 
 
 const router = createBrowserRouter([
@@ -48,7 +48,7 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      { path: "/leaderboard", element: <Leaderboard /> },
+      { path: "/leaderboard", element:<Leaderboard></Leaderboard> },
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
       { path: "/extra", element: <ExtraSection></ExtraSection> },

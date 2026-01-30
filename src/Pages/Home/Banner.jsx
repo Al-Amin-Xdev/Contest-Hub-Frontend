@@ -1,11 +1,81 @@
+import React, { useEffect, useState } from "react";
+import useAxiosSecure from "../../Hooks/useAxiosSecure";
+
 const Banner = () => {
+  const axiosSecure = useAxiosSecure();
+  const [stats, setStats] = useState({
+    confirmedContests: 0,
+    totalPrize: 0,
+    totalCreators: 0,
+    totalParticipants: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // 1️⃣ Get all contests
+        const contestsRes = await axiosSecure.get("/all-contests");
+        const allContests = contestsRes.data || [];
+
+        const confirmedContests = allContests.filter(
+          (c) => c.status === "confirmed"
+        );
+
+        const totalPrize = confirmedContests.reduce(
+          (sum, c) => sum + Number(c.prize || 0),
+          0
+        );
+
+        // 2️⃣ Get all users (creators)
+        const usersRes = await axiosSecure.get("/user-roles");
+        const creators = usersRes.data || [];
+        const totalCreators = creators.length;
+
+        // 3️⃣ Get all participants across all contests
+        let totalParticipants = 0;
+        for (const contest of confirmedContests) {
+          const participantsRes = await axiosSecure.get("/participants", {
+            params: { contestId: contest._id, email: "" }, // fetch all participants
+          });
+
+          // If your backend only supports email query, you may need another endpoint
+          // Here we assume backend returns `count` or `array of participants`
+          if (participantsRes.data && Array.isArray(participantsRes.data)) {
+            totalParticipants += participantsRes.data.length;
+          }
+        }
+
+        setStats({
+          confirmedContests: confirmedContests.length,
+          totalPrize,
+          totalCreators,
+          totalParticipants,
+        });
+      } catch (err) {
+        console.error("Failed to fetch banner stats:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, [axiosSecure]);
+
+  if (loading) {
+    return (
+      <section className="min-h-[400px] flex items-center justify-center text-white text-xl font-semibold">
+        Loading banner stats...
+      </section>
+    );
+  }
+
   return (
     <section className="relative bg-gradient-to-br from-blue-700 via-purple-700 to-indigo-800 text-white overflow-hidden">
-      {/* Overlay pattern */}
+      {/* Overlay */}
       <div className="absolute inset-0 bg-black/30"></div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 lg:py-32 grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
-        
         {/* LEFT CONTENT */}
         <div className="w-full">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
@@ -20,55 +90,44 @@ const Banner = () => {
             worldwide, and win exciting prizes. Create your own contests and
             inspire creativity.
           </p>
-
-          {/* SEARCH BAR */}
-          <div className="mt-6 sm:mt-8 bg-white rounded-lg sm:rounded-xl p-1.5 sm:p-2 flex flex-col sm:flex-row items-center shadow-lg w-full sm:max-w-xl gap-2 sm:gap-0">
-            <input
-              type="text"
-              placeholder="Search contests (Design, Writing...)"
-              className="flex-1 w-full px-3 sm:px-4 py-2.5 sm:py-3 text-gray-700 outline-none rounded-lg text-sm sm:text-base"
-            />
-            <button
-              className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:scale-105 transition text-sm sm:text-base"
-              onClick={() => console.log("Search clicked (dummy)")}
-            >
-              Search
-            </button>
-          </div>
-
-          <p className="text-xs sm:text-sm text-gray-300 mt-2 sm:mt-3">
-            🔍 Search by contest category (backend logic coming soon)
-          </p>
         </div>
 
         {/* RIGHT CONTENT (STATS) */}
         <div className="relative w-full mt-8 lg:mt-0">
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
             <div className="bg-white/10 backdrop-blur-lg rounded-lg sm:rounded-2xl p-4 sm:p-6 text-center hover:bg-white/20 transition">
-              <h3 className="text-2xl sm:text-3xl font-bold">500+</h3>
+              <h3 className="text-2xl sm:text-3xl font-bold">
+                {stats.confirmedContests}
+              </h3>
               <p className="text-gray-200 mt-1 text-xs sm:text-base">Live Contests</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-lg rounded-lg sm:rounded-2xl p-4 sm:p-6 text-center hover:bg-white/20 transition">
-              <h3 className="text-2xl sm:text-3xl font-bold">$50K+</h3>
+              <h3 className="text-2xl sm:text-3xl font-bold">
+                {stats.totalPrize.toLocaleString()}<span>  USD</span>
+              </h3>
               <p className="text-gray-200 mt-1 text-xs sm:text-base">Prize Money</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-lg rounded-lg sm:rounded-2xl p-4 sm:p-6 text-center hover:bg-white/20 transition">
-              <h3 className="text-2xl sm:text-3xl font-bold">2K+</h3>
+              <h3 className="text-2xl sm:text-3xl font-bold">
+                {stats.totalCreators}
+              </h3>
               <p className="text-gray-200 mt-1 text-xs sm:text-base">Creators</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-lg rounded-lg sm:rounded-2xl p-4 sm:p-6 text-center hover:bg-white/20 transition">
-              <h3 className="text-2xl sm:text-3xl font-bold">10K+</h3>
+              <h3 className="text-2xl sm:text-3xl font-bold">
+                {stats.totalParticipants}
+              </h3>
               <p className="text-gray-200 mt-1 text-xs sm:text-base">Participants</p>
             </div>
           </div>
         </div>
-
       </div>
     </section>
   );
 };
 
 export default Banner;
+
