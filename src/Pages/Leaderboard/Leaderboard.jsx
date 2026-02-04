@@ -31,7 +31,7 @@ const Leaderboard = () => {
           const email = contest.creatorEmail;
           if (!creatorMap[email]) {
             creatorMap[email] = {
-              name: contest.creatorName || "Unknown",
+              name: contest.name || "Unknown",
               email,
               photo:
                 contest.creatorPhoto ||

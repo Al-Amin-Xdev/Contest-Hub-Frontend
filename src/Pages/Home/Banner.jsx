@@ -3,12 +3,13 @@ import useAxiosSecure from "../../Hooks/useAxiosSecure";
 
 const Banner = () => {
   const axiosSecure = useAxiosSecure();
-  const [stats, setStats] = useState({
-    confirmedContests: 0,
-    totalPrize: 0,
-    totalCreators: 0,
-    totalParticipants: 0,
-  });
+
+  // Separate states for each stat
+  const [confirmedContests, setConfirmedContests] = useState(0);
+  const [totalPrize, setTotalPrize] = useState(0);
+  const [totalCreators, setTotalCreators] = useState(0);
+  const [totalParticipants, setTotalParticipants] = useState(0);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,40 +19,32 @@ const Banner = () => {
         const contestsRes = await axiosSecure.get("/all-contests");
         const allContests = contestsRes.data || [];
 
-        const confirmedContests = allContests.filter(
-          (c) => c.status === "confirmed"
-        );
+        const confirmed = allContests.filter((c) => c.status === "confirmed");
+        setConfirmedContests(confirmed.length);
 
-        const totalPrize = confirmedContests.reduce(
-          (sum, c) => sum + Number(c.prize || 0),
-          0
-        );
+        const prizeSum = confirmed.reduce((sum, c) => sum + Number(c.prize || 0), 0);
+        setTotalPrize(prizeSum);
 
-        // 2️⃣ Get all users (creators)
+        // 2️⃣ Get all users (count creators)
         const usersRes = await axiosSecure.get("/user-roles");
-        const creators = usersRes.data || [];
-        const totalCreators = creators.length;
+        const allUsers = usersRes.data || [];
+        console.log("All users from backend:", allUsers);
 
-        // 3️⃣ Get all participants across all contests
-        let totalParticipants = 0;
-        for (const contest of confirmedContests) {
+        const creators = allUsers.filter((user) => user.role === "creator");
+        setTotalCreators(creators.length);
+
+        // 3️⃣ Get participants across confirmed contests
+        let participantsCount = 0;
+        for (const contest of confirmed) {
           const participantsRes = await axiosSecure.get("/participants", {
             params: { contestId: contest._id, email: "" }, // fetch all participants
           });
 
-          // If your backend only supports email query, you may need another endpoint
-          // Here we assume backend returns `count` or `array of participants`
           if (participantsRes.data && Array.isArray(participantsRes.data)) {
-            totalParticipants += participantsRes.data.length;
+            participantsCount += participantsRes.data.length;
           }
         }
-
-        setStats({
-          confirmedContests: confirmedContests.length,
-          totalPrize,
-          totalCreators,
-          totalParticipants,
-        });
+        setTotalParticipants(participantsCount);
       } catch (err) {
         console.error("Failed to fetch banner stats:", err);
       } finally {
@@ -79,7 +72,7 @@ const Banner = () => {
         {/* LEFT CONTENT */}
         <div className="w-full">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
-            Discover & Create  
+            Discover & Create
             <span className="block text-yellow-300 mt-2 sm:mt-3">
               Amazing Creative Contests
             </span>
@@ -96,30 +89,24 @@ const Banner = () => {
         <div className="relative w-full mt-8 lg:mt-0">
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
             <div className="bg-white/10 backdrop-blur-lg rounded-lg sm:rounded-2xl p-4 sm:p-6 text-center hover:bg-white/20 transition">
-              <h3 className="text-2xl sm:text-3xl font-bold">
-                {stats.confirmedContests}
-              </h3>
+              <h3 className="text-2xl sm:text-3xl font-bold">{confirmedContests}</h3>
               <p className="text-gray-200 mt-1 text-xs sm:text-base">Live Contests</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-lg rounded-lg sm:rounded-2xl p-4 sm:p-6 text-center hover:bg-white/20 transition">
               <h3 className="text-2xl sm:text-3xl font-bold">
-                {stats.totalPrize.toLocaleString()}<span>  USD</span>
+                {totalPrize.toLocaleString()} <span>USD</span>
               </h3>
               <p className="text-gray-200 mt-1 text-xs sm:text-base">Prize Money</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-lg rounded-lg sm:rounded-2xl p-4 sm:p-6 text-center hover:bg-white/20 transition">
-              <h3 className="text-2xl sm:text-3xl font-bold">
-                {stats.totalCreators}
-              </h3>
+              <h3 className="text-2xl sm:text-3xl font-bold">{totalCreators}</h3>
               <p className="text-gray-200 mt-1 text-xs sm:text-base">Creators</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-lg rounded-lg sm:rounded-2xl p-4 sm:p-6 text-center hover:bg-white/20 transition">
-              <h3 className="text-2xl sm:text-3xl font-bold">
-                {stats.totalParticipants}
-              </h3>
+              <h3 className="text-2xl sm:text-3xl font-bold">{totalParticipants}</h3>
               <p className="text-gray-200 mt-1 text-xs sm:text-base">Participants</p>
             </div>
           </div>

@@ -40,7 +40,7 @@ const AddContest = () => {
       Swal.fire({
         icon: "success",
         title: "Contest Added!",
-        text: `Contest "${response.data.name}" has been added successfully ✅`,
+        text: `Contest "${response.data.name}" has been added successfully`,
         timer: 2000,
         showConfirmButton: false,
       });

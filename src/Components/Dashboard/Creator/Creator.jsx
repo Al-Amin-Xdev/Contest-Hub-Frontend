@@ -501,8 +501,8 @@ const CreatorProfile = () => {
       html: `
         <select id="swal-role" class="swal2-input">
           <option value="" disabled selected>Select Role</option>
-          <option value="Creator">Creator</option>
-          <option value="Admin">Admin</option>
+          <option value="creator">creator</option>
+          <option value="admin">admin</option>
         </select>
         <textarea id="swal-reason" class="swal2-textarea" placeholder="Reason for role change"></textarea>
       `,
