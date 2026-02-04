@@ -22,7 +22,7 @@ const Navbar = () => {
     } else {
       setAvatarURL("https://i.ibb.co/4pDNDk1/avatar.png");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [user]);
 
   const handleLogout = async () => {

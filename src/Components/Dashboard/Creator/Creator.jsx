@@ -479,7 +479,7 @@ const CreatorProfile = () => {
 
         Swal.fire({
           icon: "success",
-          title: "Profile Updated ✅",
+          title: "Profile Updated ",
           timer: 2000,
           showConfirmButton: false,
         });
@@ -535,7 +535,7 @@ const CreatorProfile = () => {
 
         Swal.fire({
           icon: "success",
-          title: "Request Sent ✅",
+          title: "Request Sent ",
           text: `Your request to become a ${formValues.requestedRole} has been submitted`,
           timer: 2000,
           showConfirmButton: false,

@@ -3,13 +3,11 @@ import Swal from "sweetalert2";
 import { useContext, useState } from "react";
 import { NavLink } from "react-router-dom";
 import AuthContext from "../../providers/AuthContext";
-// import useAxios from "../../Hooks/useAxios";
 import { useNavigate } from "react-router";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 
 const Register = () => {
   const { register, setUser } = useContext(AuthContext);
-  // const axiosInstance = useAxios(); // Axios instance with baseURL
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
   const [loading, setBtnLoading] = useState(false);
@@ -52,7 +50,7 @@ const Register = () => {
       Swal.fire({
         icon: "success",
         title: "Registration Successful",
-        text: "Your account has been created ✅",
+        text: "Your account has been created ",
         timer: 1000,
         showConfirmButton: false,
       });

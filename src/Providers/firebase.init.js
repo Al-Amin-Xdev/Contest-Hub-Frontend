@@ -1,20 +1,35 @@
-// Import the functions you need from the SDKs you need
+// // Import the functions you need from the SDKs you need
+// import { initializeApp } from "firebase/app";
+// import { getAuth } from "firebase/auth";
+// // TODO: Add SDKs for Firebase products that you want to use
+// // https://firebase.google.com/docs/web/setup#available-libraries
+
+// // Your web app's Firebase configuration
+// const firebaseConfig = {
+//   apiKey: "AIzaSyB7i3Exalgnb1PJ-G4oP40Kt5sxmgdf1ZA",
+//   authDomain: "contest-hub-91d26.firebaseapp.com",
+//   projectId: "contest-hub-91d26",
+//   storageBucket: "contest-hub-91d26.firebasestorage.app",
+//   messagingSenderId: "801267863239",
+//   appId: "1:801267863239:web:4b41a5f295e53ac94678e2"
+// };
+
+// // Initialize Firebase
+// const app = initializeApp(firebaseConfig);
+// // Initialize Firebase Authentication and get a reference to the service
+// export const auth = getAuth(app);
+
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyB7i3Exalgnb1PJ-G4oP40Kt5sxmgdf1ZA",
-  authDomain: "contest-hub-91d26.firebaseapp.com",
-  projectId: "contest-hub-91d26",
-  storageBucket: "contest-hub-91d26.firebasestorage.app",
-  messagingSenderId: "801267863239",
-  appId: "1:801267863239:web:4b41a5f295e53ac94678e2"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-// Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);

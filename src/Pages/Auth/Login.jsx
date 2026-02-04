@@ -3,7 +3,6 @@ import Swal from "sweetalert2";
 import { FcGoogle } from "react-icons/fc";
 import { useContext, useState, useEffect } from "react";
 import AuthContext from "../../providers/AuthContext";
-// import useAxios from "../../Hooks/useAxios";
 import useRole from "../../Hooks/useRole";
 import useAxiosSecure from "../../Hooks/useAxiosSecure";
 
@@ -62,13 +61,13 @@ const Login = () => {
       Swal.fire({
         icon: "success",
         title: "Login Successful",
-        text: `Welcome back, ${userInfo.user.displayName || "Contestant"}! ✅`,
+        text: `Welcome back, ${userInfo.user.displayName || "Contestant"}! `,
         timer: 1000,
         showConfirmButton: false,
       });
 
       form.reset();
-      // ❌ no navigate here (handled by role effect)
+      // no navigate here (handled by role effect)
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -134,12 +133,12 @@ const Login = () => {
       Swal.fire({
         icon: "success",
         title: "Login Successful",
-        text: `Signed in with Google as ${role}! ✅`,
+        text: `Signed in with Google as ${role}! `,
         timer: 2000,
         showConfirmButton: false,
       });
 
-      // ❌ no navigate here
+      // no navigate here
     } catch (error) {
       Swal.fire({
         icon: "error",

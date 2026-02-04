@@ -87,12 +87,12 @@ const SubmissionModal = ({
           onChange={(e) => setWorkDescription(e.target.value)}
           className="w-full mb-4 px-4 py-2 border rounded-lg dark:bg-slate-700 dark:text-white resize-none"
           rows={4}
-          disabled={hasSubmittedWork} // ✅ disable textarea if already submitted
+          disabled={hasSubmittedWork} //  disable textarea if already submitted
         />
 
         <button
           onClick={handleSubmitWork}
-          disabled={submitting || hasSubmittedWork} // ✅ disable button if already submitted
+          disabled={submitting || hasSubmittedWork} // ✅disable button if already submitted
           className={`w-full py-2.5 rounded-lg text-white font-semibold transition ${
             hasSubmittedWork
               ? "bg-gray-400 cursor-not-allowed"
@@ -122,7 +122,7 @@ const ContestDetails = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [workDescription, setWorkDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [hasSubmittedWork, setHasSubmittedWork] = useState(false); // ✅ state to track submission
+  const [hasSubmittedWork, setHasSubmittedWork] = useState(false); //  state to track submission
   const registrationDoneRef = useRef(false);
 
   // ========================
@@ -172,7 +172,7 @@ const ContestDetails = () => {
         });
         setHasJoined(res.data.joined);
 
-        // ✅ check if user already submitted work
+        // check if user already submitted work
         if (res.data.workSubmitted) {
           setHasSubmittedWork(true);
         }
@@ -292,7 +292,7 @@ const ContestDetails = () => {
         alert("Work submitted successfully!");
         setModalOpen(false);
         setWorkDescription("");
-        setHasSubmittedWork(true); // ✅ mark as submitted
+        setHasSubmittedWork(true); // mark as submitted
       }
     } catch (err) {
       console.error("Submit work error:", err);
@@ -387,7 +387,7 @@ const ContestDetails = () => {
             ) : (
               <button
                 onClick={() => setModalOpen(true)}
-                disabled={hasSubmittedWork} // ✅ disable if already submitted
+                disabled={hasSubmittedWork} // disable if already submitted
                 className={`w-full sm:w-auto px-6 py-3 rounded-lg font-semibold text-white transition ${
                   hasSubmittedWork
                     ? "bg-gray-400 cursor-not-allowed"
@@ -410,7 +410,7 @@ const ContestDetails = () => {
           workTitle={contest.name}
           workDescription={workDescription}
           setWorkDescription={setWorkDescription}
-          hasSubmittedWork={hasSubmittedWork} // ✅ pass to modal
+          hasSubmittedWork={hasSubmittedWork} // pass to modal
         />
       </div>
     </section>
