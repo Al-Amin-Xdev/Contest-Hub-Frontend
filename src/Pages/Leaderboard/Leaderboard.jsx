@@ -149,6 +149,7 @@ const Leaderboard = () => {
          ========================== */}
       {activeTab === "contests" && (
         <div className="max-w-5xl mx-auto grid gap-4">
+          <span className="text-white">👨‍👩‍👧‍👧Popular contest based participnats</span>
           {topContests.map((contest, index) => (
             <div
               key={contest._id}
@@ -164,10 +165,6 @@ const Leaderboard = () => {
                   Creator: {contest.creatorEmail}
                 </p>
               </div>
-
-              <span className="font-bold text-purple-600">
-                {contest.participants} Participants
-              </span>
             </div>
           ))}
         </div>

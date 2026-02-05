@@ -104,7 +104,7 @@ const Login = () => {
           input: "radio",
           inputOptions: {
             user: "User",
-            creator: "Contest Creator",
+            creator: "Creator",
           },
           inputValidator: (value) =>
             value ? null : "You need to choose a role!",

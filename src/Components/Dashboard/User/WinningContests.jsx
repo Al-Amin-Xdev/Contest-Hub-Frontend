@@ -1,15 +1,3 @@
-// import React from 'react';
-
-// const WinningContests = () => {
-//     return (
-//         <div>
-//             <h1>Winning Contests</h1>
-//         </div>
-//     );
-// };
-
-// export default WinningContests;
-
 import React, { useContext } from "react";
 import { FaTrophy } from "react-icons/fa";
 import AuthContext from "../../../providers/AuthContext";

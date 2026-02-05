@@ -28,23 +28,14 @@ const Banner = () => {
         // 2️⃣ Get all users (count creators)
         const usersRes = await axiosSecure.get("/user-roles");
         const allUsers = usersRes.data || [];
-        console.log("All users from backend:", allUsers);
-
         const creators = allUsers.filter((user) => user.role === "creator");
         setTotalCreators(creators.length);
 
-        // 3️⃣ Get participants across confirmed contests
-        let participantsCount = 0;
-        for (const contest of confirmed) {
-          const participantsRes = await axiosSecure.get("/participants", {
-            params: { contestId: contest._id, email: "" }, // fetch all participants
-          });
+        // 3️⃣ Get total participants across all contests
+        const participantsRes = await axiosSecure.get("/all-participants");
+        const allParticipants = participantsRes.data || [];
+        setTotalParticipants(allParticipants.length);
 
-          if (participantsRes.data && Array.isArray(participantsRes.data)) {
-            participantsCount += participantsRes.data.length;
-          }
-        }
-        setTotalParticipants(participantsCount);
       } catch (err) {
         console.error("Failed to fetch banner stats:", err);
       } finally {

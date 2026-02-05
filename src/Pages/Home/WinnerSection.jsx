@@ -7,27 +7,31 @@ const WinnerSection = () => {
   const axiosSecure = useAxiosSecure();
   const [winners, setWinners] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0); // For slider
-
-  const winnersPerPage = 3; // number of winners visible at once
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   // ========================
-  // Fetch all winners
+  // Fetch Winners
   // ========================
   useEffect(() => {
     const fetchWinners = async () => {
       try {
-        // Get all submissions marked as winner
-        const res = await axiosSecure.get("/submit-work"); // GET all submissions
-        const winnerSubmissions = res.data.filter((sub) => sub.winStatus === "winner");
+        const res = await axiosSecure.get("/submit-work");
 
-        // Map to winner data
+        // Filter winner submissions
+        const winnerSubmissions = res.data.filter(
+          (sub) => sub.winStatus === "winner"
+        );
+
+        // Map DB → UI structure
         const winnerData = winnerSubmissions.map((sub) => ({
           id: sub._id,
-          name: sub.participant.participantName,
-          contest: sub.contestInfo.name,
-          prize: `$${sub.contestInfo.prize || 0}`,
-          photo: sub.participant.photo || `https://ui-avatars.com/api/?name=${sub.participant.participantName}&background=4f46e5&color=fff`,
+          name: sub.participant?.participantName || "Winner",
+          email: sub.participant?.participantEmail || "",
+          contest: sub.contestInfo?.name || "Unknown Contest",
+          prize: `$${sub.contestInfo?.prize || 0}`,
+          photo: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+            sub.participant?.participantName || "Winner"
+          )}&background=4f46e5&color=fff`,
         }));
 
         setWinners(winnerData);
@@ -42,16 +46,43 @@ const WinnerSection = () => {
   }, [axiosSecure]);
 
   // ========================
-  // Slider navigation
+  // Dynamic winners per page
+  // ========================
+  const winnersPerPage = Math.min(3, winners.length || 1);
+
+  // ========================
+  // Auto Slider
+  // ========================
+  useEffect(() => {
+    if (!winners.length) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex(
+        (prev) => (prev + winnersPerPage) % winners.length
+      );
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [winners, winnersPerPage]);
+
+  // ========================
+  // Manual Slider
   // ========================
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - winnersPerPage + winners.length) % winners.length);
+    setCurrentIndex(
+      (prev) => (prev - winnersPerPage + winners.length) % winners.length
+    );
   };
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + winnersPerPage) % winners.length);
+    setCurrentIndex(
+      (prev) => (prev + winnersPerPage) % winners.length
+    );
   };
 
+  // ========================
+  // Loading UI
+  // ========================
   if (loading) {
     return (
       <div className="min-h-[300px] flex items-center justify-center text-gray-900 dark:text-white text-xl font-semibold">
@@ -68,11 +99,19 @@ const WinnerSection = () => {
     );
   }
 
-  // Get visible winners
-  const visibleWinners = winners.slice(currentIndex, currentIndex + winnersPerPage);
-  // If at end, wrap around
+  // ========================
+  // Visible Winners
+  // ========================
+  let visibleWinners = winners.slice(
+    currentIndex,
+    currentIndex + winnersPerPage
+  );
+
   if (visibleWinners.length < winnersPerPage) {
-    visibleWinners.push(...winners.slice(0, winnersPerPage - visibleWinners.length));
+    visibleWinners = [
+      ...visibleWinners,
+      ...winners.slice(0, winnersPerPage - visibleWinners.length),
+    ];
   }
 
   return (
@@ -85,12 +124,13 @@ const WinnerSection = () => {
             🏆 Celebrate Our Recent Winners
           </h2>
           <p className="mt-3 sm:mt-4 text-sm sm:text-base text-gray-100 max-w-2xl mx-auto px-2">
-            See who’s winning big! Get inspired and join our contests to showcase your talent and claim exciting prizes.
+            See who’s winning big! Get inspired and join our contests to showcase your talent.
           </p>
         </div>
 
         {/* Slider */}
         <div className="relative flex items-center">
+
           {/* Left Arrow */}
           <button
             onClick={prevSlide}
@@ -111,8 +151,15 @@ const WinnerSection = () => {
                   alt={winner.name}
                   className="w-20 sm:w-24 h-20 sm:h-24 rounded-full border-4 border-white object-cover mb-3 sm:mb-4"
                 />
-                <h3 className="text-lg sm:text-xl font-bold line-clamp-2">{winner.name}</h3>
-                <p className="text-xs sm:text-sm mt-1 text-gray-100 line-clamp-2">{winner.contest}</p>
+
+                <h3 className="text-lg sm:text-xl font-bold line-clamp-2">
+                  {winner.name}
+                </h3>
+
+                <p className="text-xs sm:text-sm mt-1 text-gray-100 line-clamp-2">
+                  {winner.contest}
+                </p>
+
                 <span className="mt-2 sm:mt-3 px-3 sm:px-4 py-1 bg-yellow-400 text-gray-900 text-xs sm:text-sm font-semibold rounded-full">
                   {winner.prize}
                 </span>
@@ -127,18 +174,20 @@ const WinnerSection = () => {
           >
             <FaArrowRight />
           </button>
+
         </div>
 
-        {/* Total Winners / Call-to-Action */}
+        {/* CTA */}
         <div className="mt-10 sm:mt-12 md:mt-16 text-center">
           <p className="text-base sm:text-lg md:text-xl font-semibold px-2">
             🌟 Over {winners.length} participants have won exciting prizes!
           </p>
-          <NavLink to="/contests"><button
-            className="mt-4 sm:mt-6 px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base rounded-full bg-white text-purple-700 font-bold hover:scale-105 transition hover:bg-gray-100"
-          >
-            Join a Contest Now
-          </button></NavLink>
+
+          <NavLink to="/contests">
+            <button className="mt-4 sm:mt-6 px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base rounded-full bg-white text-purple-700 font-bold hover:scale-105 transition hover:bg-gray-100">
+              Join a Contest Now
+            </button>
+          </NavLink>
         </div>
 
       </div>
@@ -147,4 +196,3 @@ const WinnerSection = () => {
 };
 
 export default WinnerSection;
-

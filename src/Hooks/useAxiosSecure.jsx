@@ -4,7 +4,7 @@ import useAuth from "./useAuth";
 
 
 const instance = axios.create({
-  baseURL: "http://localhost:5000", // your backend url
+  baseURL: "https://contest-hub-backend-self.vercel.app", 
 });
 
 const useAxiosSecure = () => {

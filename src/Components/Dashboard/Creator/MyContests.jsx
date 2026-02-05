@@ -12,7 +12,7 @@ const MyContests = () => {
   useEffect(() => {
     const fetchContests = async () => {
       try {
-        const response = await axiosSecure.get("http://localhost:5000/all-contests");
+        const response = await axiosSecure.get("/all-contests");
         const allContests = response.data;
 
         const myContests = allContests.filter(

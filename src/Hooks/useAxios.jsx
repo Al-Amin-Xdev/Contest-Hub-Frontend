@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const AxiosInstance = axios.create({
-  baseURL: 'http://localhost:5000'
+  baseURL: 'https://contest-hub-backend-self.vercel.app'
 })
 
 const useAxios =()=>{
